@@ -11,14 +11,6 @@
 #
 ###
 
-ARG TF_VERSION
-ENV TF_VERSION ${TF_VERSION:-v0.12.29}
-
-RUN go get rsc.io/goversion \
-    && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
-
-FROM debian:bullseye
-
 ARG GOLANG_VERSION=1.15.2
 ENV GOLANG_VERSION ${GOLANG_VERSION:-1.15.2}
 FROM golang:$GOLANG_VERSION AS builder
@@ -34,6 +26,14 @@ ENV CONTAINERD_VERSION ${CONTAINERD_VERSION:-1.4.6-1}
 
 ARG DOCKER_VERSION=20.10.7~3-0
 ENV DOCKER_VERSION ${DOCKER_VERSION:-20.10.7~3-0}
+
+ARG TF_VERSION
+ENV TF_VERSION ${TF_VERSION:-v0.12.29}
+
+RUN go get rsc.io/goversion \
+    && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
+
+FROM debian:bullseye
 
 RUN echo "Oh dang look at that $DOCKER_VERSION and $CONTAINERD_VERSION"
 
