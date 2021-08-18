@@ -14,20 +14,14 @@
 ARG GOLANG_VERSION=1.15.2
 FROM golang:$GOLANG_VERSION AS builder
 
-
-RUN echo "$GOLANG_VERSION, $BAZEL_VERSION, $IBM_CLOUD_VERSION"
-
-
 FROM debian:bullseye
 
 ARG GOLANG_VERSION
-ARG BAZEL_VERSION=2.2.0
 ARG IBM_CLOUD_VERSION=1.2.1
 
-RUN echo "$GOLANG_VERSION, $BAZEL_VERSION, $IBM_CLOUD_VERSION"
+RUN echo "$GOLANG_VERSION, $IBM_CLOUD_VERSION"
 
 ENV GOLANG_VERSION ${GOLANG_VERSION:-1.15.2}
-ENV BAZEL_VERSION ${BAZEL_VERSION:-2.2.0}
 ENV IBM_CLOUD_VERSION ${IBM_CLOUD_VERSION:-1.2.1}
 
 ARG CONTAINERD_VERSION=1.4.6-1
@@ -35,8 +29,6 @@ ENV CONTAINERD_VERSION ${CONTAINERD_VERSION:-1.4.6-1}
 
 ARG DOCKER_VERSION=20.10.7~3-0
 ENV DOCKER_VERSION ${DOCKER_VERSION:-20.10.7~3-0}
-
-RUN echo "this is $CONTAINERD_VERSION"
 
 WORKDIR /workspace
 RUN mkdir -p /workspace
@@ -91,16 +83,10 @@ RUN set -eux; \
         'amd64') \
             url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz"; \
             ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/linux64"; \
-            curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg; \
-            mv bazel.gpg /etc/apt/trusted.gpg.d/; \
-            echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list; \
-            apt update && apt install -y bazel=$BAZEL_VERSION; \
             ;; \
         'ppc64el') \
             url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz"; \
             ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/ppc64le"; \
-            wget -O /usr/local/bin/bazel "https://oplab9.parqtec.unicamp.br/pub/ppc64el/bazel/ubuntu_18.04/bazel_bin_ppc64le_$BAZEL_VERSION" --progress=dot:giga; \
-            chmod +x /usr/local/bin/bazel; \
             ;; \
         's390x') \
             url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-s390x.tar.gzr"; \
