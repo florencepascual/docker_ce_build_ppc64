@@ -16,6 +16,8 @@
 ARG GOLANG_VERSION=1.15.2
 ARG BAZEL_VERSION=2.2.0
 ARG IBM_CLOUD_VERSION=1.2.1
+ARG CONTAINERD_VERSION=1.4.6-1
+ARG DOCKER_VERSION=20.10.7~3-0
 FROM golang:$GOLANG_VERSION AS builder
 
 ARG TF_VERSION
@@ -75,9 +77,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ##### Install docker-ce from the local directory
 RUN mkdir -p /workspace/tmp
 
-COPY containerd.io_1.4.4-1_ppc64el.deb /workspace/tmp
-COPY docker-ce-cli_20.10.6~3-0~debian-bullseye_ppc64el.deb  /workspace/tmp
-COPY docker-ce_20.10.6~3-0~debian-bullseye_ppc64el.deb /workspace/tmp
+RUN wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_{CONTAINERD_VERSION}_ppc64el.deb; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb
+
+COPY containerd.io_{CONTAINERD_VERSION}_ppc64el.deb /workspace/tmp
+COPY docker-ce-cli_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb  /workspace/tmp
+COPY docker-ce_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb /workspace/tmp
 
 RUN dpkg -i /workspace/tmp/*\
     && rm -rf /workspace/tmp
