@@ -76,24 +76,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ##### Install docker-ce from the local directory
 RUN mkdir -p /workspace/tmp
 
-RUN set -eux; \
-    \
-    case "${dpkgArch##*-}" in \
-        'amd64') \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/containerd.io_1.4.6-1_amd64.deb -P /workspace/tmp; \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce-cli_20.10.7~3-0~debian-bullseye_amd64.deb -P /workspace/tmp; \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce_20.10.7~3-0~debian-bullseye_amd64.deb -P /workspace/tmp; \
-	    ;; \
-        'ppc64el') \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_1.4.6-1_ppc64el.deb -P /workspace/tmp; \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
-            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
-            ;; \
-    esac; \
-    \
+RUN wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_1.4.6-1_ppc64el.deb -P /workspace/tmp; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
     dpkg -i /workspace/tmp/*\
     && rm -rf /workspace/tmp
-
 
 #COPY containerd.io_1.4.6-1_ppc64el.deb /workspace/tmp
 #COPY docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb  /workspace/tmp
