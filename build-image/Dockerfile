@@ -4,10 +4,8 @@
 ##
 
 ##
-# Instruction: Manually copy the deb file in the Dockerfile folder
-# cp /package2test/containerd/debian/bullseye/ppc64el/containerd.io_1.4.4-1_ppc64el.deb .
-# cp /package2test/docker-ce/debian-bullseye/docker-ce-cli_20.10.6~3-0~debian-bullseye_ppc64el.deb .
-# cp /package2test/docker-ce/debian-bullseye/docker-ce_20.10.6~3-0~debian-bullseye_ppc64el.deb .
+# Instruction: Manually copy or wget the deb file in the Dockerfile folder or wget in the Dockerfile
+# wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_{CONTAINERD_VERSION}_ppc64el.deb
 #
 #  docker build -t docker_ce_build .
 #
