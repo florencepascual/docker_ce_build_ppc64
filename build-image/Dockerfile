@@ -5,7 +5,7 @@
 
 ##
 # Instruction: Manually copy or wget the deb file in the Dockerfile folder or wget in the Dockerfile
-# wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_{CONTAINERD_VERSION}_ppc64el.deb
+# wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_$CONTAINERD_VERSION_ppc64el.deb
 #
 #  docker build -t docker_ce_build .
 #
