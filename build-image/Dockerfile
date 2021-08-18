@@ -24,7 +24,6 @@ RUN go get rsc.io/goversion \
 
 FROM debian:bullseye
 
-
 ENV GOLANG_VERSION ${GOLANG_VERSION:-1.15.2}
 ENV BAZEL_VERSION ${BAZEL_VERSION:-2.2.0}
 ENV IBM_CLOUD_VERSION ${IBM_CLOUD_VERSION:-1.2.1}
@@ -77,16 +76,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ##### Install docker-ce from the local directory
 RUN mkdir -p /workspace/tmp
 
-RUN wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_1.4.6-1_ppc64el.deb -P /workspace/tmp; \
-    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
-    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp
+RUN set -eux; \
+    \
+    case "${dpkgArch##*-}" in \
+        'amd64') \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/containerd.io_1.4.6-1_amd64.deb -P /workspace/tmp; \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce-cli_20.10.7~3-0~debian-bullseye_amd64.deb -P /workspace/tmp; \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce_20.10.7~3-0~debian-bullseye_amd64.deb -P /workspace/tmp; \
+	    ;; \
+        'ppc64el') \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_1.4.6-1_ppc64el.deb -P /workspace/tmp; \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
+            wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_20.10.7~3-0~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
+            ;; \
+    esac; \
+    \
+    dpkg -i /workspace/tmp/*\
+    && rm -rf /workspace/tmp
+
 
 #COPY containerd.io_1.4.6-1_ppc64el.deb /workspace/tmp
 #COPY docker-ce-cli_20.10.7~3-0~debian-bullseye_ppc64el.deb  /workspace/tmp
 #COPY docker-ce_20.10.7~3-0~debian-bullseye_ppc64el.deb /workspace/tmp
 
-RUN dpkg -i /workspace/tmp/*\
-    && rm -rf /workspace/tmp
+#RUN dpkg -i /workspace/tmp/*\
+    #&& rm -rf /workspace/tmp
 
 
 RUN set -eux; \
