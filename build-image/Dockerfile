@@ -14,6 +14,12 @@
 ARG GOLANG_VERSION=1.15.2
 FROM golang:$GOLANG_VERSION AS builder
 
+ARG TF_VERSION
+ENV TF_VERSION ${TF_VERSION:-v0.12.29}
+
+RUN go get rsc.io/goversion \
+    && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
+
 FROM debian:bullseye
 
 ARG GOLANG_VERSION
