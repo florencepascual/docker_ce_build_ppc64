@@ -75,9 +75,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ##### Install docker-ce from the local directory
 RUN mkdir -p /workspace/tmp
 
-RUN wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_{CONTAINERD_VERSION}_ppc64el.deb; \
-    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb; \
-    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb
+RUN wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_${CONTAINERD_VERSION}_ppc64el.deb; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_${DOCKER_VERSION}~debian-bullseye_ppc64el.deb; \
+    wget https://download-stage.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_${DOCKER_VERSION}~debian-bullseye_ppc64el.deb
 
 COPY containerd.io_{CONTAINERD_VERSION}_ppc64el.deb /workspace/tmp
 COPY docker-ce-cli_{DOCKER_VERSION}~debian-bullseye_ppc64el.deb  /workspace/tmp
