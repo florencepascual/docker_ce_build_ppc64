@@ -5,7 +5,7 @@
 - Step 0 : Start a local web server
 - Step 1 : Build containerd in a container
 - Step 2 : Build docker_ce in a container
-- Step 3 : Check in /home/aurelien/docker-ce/ that the containerd and docker_ce directories contain the bundles for each distro
+- Step 3 : Check the bundles in /home/aurelien/docker-ce/
 - Step 4 : Push to /package2test dir for testing and update symbolic links
 - Step 5 : Launch validation tests from a container
 - Step 6 : Push to COS bucket
