@@ -71,7 +71,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iptables libdevmapper1.02.1 \
     && rm -rf /var/lib/apt/lists/*
 
-##### Install docker-ce from the local directory
+##### Install docker-ce
 RUN mkdir -p /workspace/tmp
 
 RUN wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_${CONTAINERD_VERSION}_ppc64el.deb -P /workspace/tmp; \
@@ -81,22 +81,8 @@ RUN wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc
     && rm -rf /workspace/tmp
 
 RUN set -eux; \
-    \
-    dpkgArch="$(dpkg --print-architecture)"; \
-    case "${dpkgArch##*-}" in \
-        'amd64') \
-            url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz"; \
-            ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/linux64"; \
-            ;; \
-        'ppc64el') \
-            url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz"; \
-            ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/ppc64le"; \
-            ;; \
-        's390x') \
-            url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-s390x.tar.gzr"; \
-            ;; \
-    esac; \
-    \
+    url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz"; \
+    ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/ppc64le"; \
     wget -O go.tgz "$url" --progress=dot:giga; \
     tar -C /usr/local -xzf go.tgz; \
     rm go.tgz; \
