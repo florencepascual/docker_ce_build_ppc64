@@ -11,22 +11,7 @@
 #
 ###
 
-ARG GOLANG_VERSION=1.15.2
-FROM golang:$GOLANG_VERSION AS builder
-
-ARG TF_VERSION
-ENV TF_VERSION ${TF_VERSION:-v0.12.29}
-
-RUN go get rsc.io/goversion \
-    && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
-
 FROM debian:bullseye
-
-ARG GOLANG_VERSION
-ARG IBM_CLOUD_VERSION=1.2.1
-
-ENV GOLANG_VERSION ${GOLANG_VERSION:-1.15.2}
-ENV IBM_CLOUD_VERSION ${IBM_CLOUD_VERSION:-1.2.1}
 
 ARG CONTAINERD_VERSION=1.4.6-1
 ENV CONTAINERD_VERSION ${CONTAINERD_VERSION:-1.4.6-1}
@@ -38,9 +23,6 @@ WORKDIR /workspace
 RUN mkdir -p /workspace
 ENV WORKSPACE=/workspace \
     TERM=xterm
-ENV PATH /usr/local/go/bin:$PATH
-
-COPY --from=builder /go/bin/* /usr/local/bin/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-transport-https \
@@ -71,34 +53,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iptables libdevmapper1.02.1 \
     && rm -rf /var/lib/apt/lists/*
 
-##### Install docker-ce
+
 RUN mkdir -p /workspace/tmp
 
-RUN wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_${CONTAINERD_VERSION}_ppc64el.deb -P /workspace/tmp; \
+RUN set -eux; \
+    wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/containerd.io_${CONTAINERD_VERSION}_ppc64el.deb -P /workspace/tmp; \
     wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_$DOCKER_VERSION~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
     wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_$DOCKER_VERSION~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
     dpkg -i /workspace/tmp/*\
-    && rm -rf /workspace/tmp
-
-RUN set -eux; \
-    url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz"; \
-    ibm_cloud_url="https://clis.ng.bluemix.net/download/bluemix-cli/${IBM_CLOUD_VERSION}/ppc64le"; \
-    wget -O go.tgz "$url" --progress=dot:giga; \
-    tar -C /usr/local -xzf go.tgz; \
-    rm go.tgz; \
-    go version; \
-    wget -O ibm_cloud.tgz "$ibm_cloud_url" --progress=dot:giga; \
-    tar -xf ibm_cloud.tgz; \
-    ./Bluemix_CLI/install; \
-    ibmcloud plugin install power-iaas; \
-    ibmcloud plugin install cloud-object-storage; \
-    rm -rf ./Bluemix_CLI; \
-    rm ibm_cloud.tgz; \
+    && rm -rf /workspace/tmp; \
     rm -rf /var/lib/apt/lists/*
-
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 ##
 #Docker in Docker inspired from
