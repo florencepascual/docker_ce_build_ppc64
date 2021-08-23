@@ -70,9 +70,6 @@ RUN set -eux; \
             wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce-cli_$DOCKER_VERSION~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
             wget https://download.docker.com/linux/debian/dists/bullseye/pool/stable/ppc64el/docker-ce_$DOCKER_VERSION~debian-bullseye_ppc64el.deb -P /workspace/tmp; \
             ;; \
-        's390x') \
-            # install docker-ce, docker-ce-cli, containerd
-            ;; \
     esac; \
     \
     dpkg -i /workspace/tmp/*\
