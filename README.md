@@ -51,7 +51,7 @@ Edit version of the docker_ce we want to build and commit tag/hash of docker-ce-
 DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x docker_ce_build_ppc64/build_docker-ce.sh> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
 ```
 
-### Step 3 : Check in /home/aurelien/docker-ce/ that the containerd and docker_ce directories contain the bundles for each distro
+### Step 3 : Check in /home/aurelien/docker-ce/ that the docker_ce directory contain the bundles for each distro and that containerd contain the deb and rpm files
 ```
 cd /home/aurelien/docker-ce/docker-ce-050821-2011
 find docker-ce-050821-2011
@@ -59,7 +59,6 @@ find docker-ce-050821-2011 | grep bundles
 
 cd /home/aurelien/docker-ce/containerd-050821-2142
 find containerd-050821-2142
-find containerd-050821-2142 | grep bundles 
 ```
 
 ### Step 4 : Push to /package2test dir for testing and update symbolic links
