@@ -14,7 +14,7 @@
 
 ### Step 0 : Start a local web server for serving install packages and test suite
 ```
-(cd /package2test/ && nohup python3 -m http.server 8080 > ~/http_880.log  2>&1) &
+(cd /package2test/ && nohup python3 -m http.server 8080 > /home/aurelien/http_880.log  2>&1) &
 ```
 ### Step 1 : Build containerd in a container
 
@@ -36,7 +36,7 @@ DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 
 #### Launch a container and connect through it
 ```
 CONT_NAME=docker-build_local_docker_ce
-docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
+docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
 docker exec -it $CONT_NAME /bin/bash
 ```
 #### Run the docker_ce script from github and pass the version we want to build (ie v20.10.7)
@@ -75,7 +75,7 @@ sudo ln -s /package2test/containerd-050821-2142 /package2test/containerd
 ### Step 5 : Launch validation tests from a container
 ```
 CONT_NAME=docker-test_local_docker
-docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
+docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
 docker exec -it $CONT_NAME /bin/bash
 git clone https://github.com/alunsin/docker_ce_build_ppc64.git
 cd docker_ce_build_ppc64/test
@@ -103,7 +103,8 @@ docker stop $CONT_NAME && docker rm $CONT_NAME
 Requires s3fs >= 1.88, such as the one available from the debian:bullseye
 ```
 CONT_NAME=docker_s3_copy
-docker run -it -v ~/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
+docker run -it -v /home/aurelien
+/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
 docker exec -it $CONT_NAME /bin/bash
 apt update && apt install -y s3fs
 ```
@@ -155,7 +156,7 @@ cp -r $DOCKER_DIR $CONTAINERD_DIR /mnt/s3_ibm-docker-builds/
 ### Step 7 : Test stage - Run the test_distrib script
 ```
 CONT_NAME=docker-test_staging_docker
-docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
+docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
 docker exec -it $CONT_NAME /bin/bash
 git clone https://github.com/alunsin/docker_ce_build_ppc64.git
 cd docker_ce_build_ppc64/test-staging
