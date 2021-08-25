@@ -103,8 +103,7 @@ docker stop $CONT_NAME && docker rm $CONT_NAME
 Requires s3fs >= 1.88, such as the one available from the debian:bullseye
 ```
 CONT_NAME=docker_s3_copy
-docker run -it -v /home/aurelien
-/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
+docker run -it -v /home/aurelien/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
 docker exec -it $CONT_NAME /bin/bash
 apt update && apt install -y s3fs
 ```
