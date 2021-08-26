@@ -1,29 +1,40 @@
 #/bin/bash
 
 if [[ ! -d docker-ce-packaging ]]
+# if there is no docker-ce-packaging, git clone with depth 1
 then
     echo "no docker-ce-packaging"
     git clone https://github.com/docker/docker-ce-packaging --depth 1
+else
+# if there is, update any changes
+    cd docker-ce-packaging && git pull --depth 1 && cd ..
 fi
 
 if [[ ! -f env.list ]]
+# if there is no env.list file, create the file
 then
     echo "no env.list"
     touch env.list
+else
+# if there is already DEB_LIST or RPM_LIST, remove these lines
+    if [[ grep -Fxq DEB_LIST env.list ]] 
+    then
+        echo "RPM LIST already"
+        sed -i '/^RPM_LIST/d' env.list
+        cat env.list
+    elif [[ grep -Fxq RPM_LIST env.list ]]
+    then 
+        echo "DEB_LIST already"
+        sed -i '/^DEB_LIST/d' env.list
+        cat env.list
+    fi
+    echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
+    echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
 fi
 
-
-#echo DEB_LIST=`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*` >> env.list
-#echo RPM_LIST=`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*` >> env.list
-
-DEB_LIST="debian-bullseye debian-buster ubuntu-bionic ubuntu-focal ubuntu-groovy ubuntu-hirsute"
-RPM_LIST="centos-7 centos-8 fedora-33 fedora-34"
-
-for PACKTYPE in RPM_LIST; do
+for PACKTYPE in DEB_LIST RPM_LIST; do
   echo "There is $PACKTYPE"
-
   for DISTRO in ${!PACKTYPE}; do
-
     echo "There is $DISTRO"
   done
 done
