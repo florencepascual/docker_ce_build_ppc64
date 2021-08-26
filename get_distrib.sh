@@ -28,13 +28,21 @@ else
         sed -i '/^DEB_LIST/d' env.list
         cat env.list
     fi
-    echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
-    echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
 fi
+
+echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
+echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
+
+cat env.list
+echo $DEB_LIST
+echo $RPM_LIST
+
 
 for PACKTYPE in DEB_LIST RPM_LIST; do
   echo "There is $PACKTYPE"
+
   for DISTRO in ${!PACKTYPE}; do
+
     echo "There is $DISTRO"
   done
 done
