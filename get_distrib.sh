@@ -28,7 +28,3 @@ fi
 # get the packages list in the env.list
 echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
 echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
-
-# set the env variables
-DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\"
-RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\"
