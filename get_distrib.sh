@@ -17,6 +17,9 @@ then
     touch env.list
 else
 # if there is already DEB_LIST or RPM_LIST, remove these lines
+    echo "??"
+    cat env.list
+    echo "??"
     if grep -Fq "DEB_LIST" env.list
     then
         echo "RPM LIST already"
@@ -34,15 +37,17 @@ echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> en
 echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
 
 cat env.list
+echo "??"
 echo $DEB_LIST
 echo $RPM_LIST
+echo "??"
 
 
 for PACKTYPE in DEB_LIST RPM_LIST; do
   echo "There is $PACKTYPE"
 
   for DISTRO in ${!PACKTYPE}; do
-
+    echo " ? "
     echo "There is $DISTRO"
   done
 done
