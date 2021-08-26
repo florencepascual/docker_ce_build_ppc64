@@ -17,12 +17,12 @@ then
     touch env.list
 else
 # if there is already DEB_LIST or RPM_LIST, remove these lines
-    if [[ grep -Fxq DEB_LIST env.list ]] 
+    if grep -Fq "DEB_LIST" env.list
     then
         echo "RPM LIST already"
         sed -i '/^RPM_LIST/d' env.list
         cat env.list
-    elif [[ grep -Fxq RPM_LIST env.list ]]
+    elif grep -Fq "RPM_LIST" env.list
     then 
         echo "DEB_LIST already"
         sed -i '/^DEB_LIST/d' env.list
