@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 if [[ ! -d docker-ce-packaging ]]
 # if there is no docker-ce-packaging, git clone with depth 1
