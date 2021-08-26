@@ -32,7 +32,7 @@ else
         cat env.list
     fi
 fi
-
+echo "get list packages"
 echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
 echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
 
