@@ -22,13 +22,14 @@ else
     echo "??"
     if grep -Fq "DEB_LIST" env.list
     then
-        echo "RPM LIST already"
-        sed -i '/^RPM_LIST/d' env.list
-        cat env.list
-    elif grep -Fq "RPM_LIST" env.list
-    then 
-        echo "DEB_LIST already"
+        echo "DEB LIST already"
         sed -i '/^DEB_LIST/d' env.list
+        cat env.list
+    fi
+    if grep -Fq "RPM_LIST" env.list
+    then 
+        echo "RPM_LIST already"
+        sed -i '/^RPM_LIST/d' env.list
         cat env.list
     fi
 fi
@@ -36,12 +37,10 @@ echo "get list packages"
 echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env.list
 echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env.list
 
-cat env.list
-echo "??"
-echo $DEB_LIST
-echo $RPM_LIST
-echo "??"
+DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\"
+RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\"
 
+echo $RPM_LIST
 
 for PACKTYPE in DEB_LIST RPM_LIST; do
   echo "There is $PACKTYPE"
