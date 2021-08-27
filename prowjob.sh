@@ -28,7 +28,7 @@ then
         echo "There is no env.list"
         exit 1
     fi
-    if ! grep -Fq "DOCKER_CE_VERS" env.list
+    if ! grep -Fq "DOCKER_VERS" env.list
     # if there is no docker_ce version
     then
         echo "There is no version of docker_ce"
@@ -53,7 +53,6 @@ then
         exit 1
     fi
 
-    cat env.list
     # container to build docker-ce and containerd
     #CONT_NAME=docker-build
     #docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
