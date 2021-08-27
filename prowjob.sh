@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
-PATH_DOCKERD_ENTRYPOINT=""
+PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
 PATH_DOCKERD_STARTING=""
 PATH_IMAGE_BUILD="quay.io/florencepascual"
 PATH_SCRIPT_BUILD=""
@@ -14,7 +13,7 @@ echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/container
 cat env.list
 
 # docker daemon
-.${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
+bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
 # wait for the dockerd to start
 . .${PATH_DOCKERD_STARTING}/dockerd-starting.sh
 # while the docker daemon is running
@@ -29,25 +28,25 @@ then
         echo "There is no env.list"
         exit 1
     fi
-    if grep -Fq "DOCKER_CE_VERS" env.list
+    if ! grep -Fq "DOCKER_CE_VERS" env.list
     # if there is no docker_ce version
     then
         echo "There is no version of docker_ce"
         exit 1
     fi
-    if grep -Fq "CONTAINERD_VERS" env.list
+    if ! grep -Fq "CONTAINERD_VERS" env.list
     # if there is no containerd version
     then 
         echo "There is no version of containerd"
         exit 1
     fi
-    if grep -Fq "DEB_LIST" env.list
+    if ! grep -Fq "DEB_LIST" env.list
     # if there is no deb_list
     then
         echo "There is no distro in DEB"
         exit 1
     fi
-    if grep -Fq "RPM_LIST" env.list
+    if ! grep -Fq "RPM_LIST" env.list
     # if there is no rpm_list
     then 
         echo "There is no distro in RPM"
