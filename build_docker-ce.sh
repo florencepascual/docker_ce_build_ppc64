@@ -24,11 +24,12 @@
 #  DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x docker_ce_build_ppc64/build_docker-ce.sh> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
 ##
 
-REF='v20.10.7'
-PACKAGING_REF='2455a897c45a7ab7f155950d3f69f28147c1526f'
+# PACKAGING_REF='2455a897c45a7ab7f155950d3f69f28147c1526f'
 DATE=`date +%d%m%y-%H%S`
-BUILD_OUT_DIR="/docker-ce/docker-ce-$DATE"
-mkdir $BUILD_OUT_DIR
+DOCKER_DIR="/docker-ce/docker-ce-$DATE"
+
+
+# DOCKER_VERS, DEB_LIST and RPM_LIST
 
 #Workaround for builkit cache issue where fedora-32/Dockerfile
 # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -44,12 +45,14 @@ patchDockerFiles() {
   done
 }
 
-if [ ! -d "$BUILD_OUT_DIR" ]; then
-  echo "Build output directory does not exist ${DIR}"  >&2
-  exit 1
+if [ ! -d "$DOCKER_DIR" ]; then
+  mkdir $DOCKER_DIR
 fi
 
 echo "Populating docker-ce-packaging from git ref=$PACKAGING_REF"
+
+PACKAGING_DIR="docker-ce-packaging"
+mkdir $PACKAGING_DIR
 
 PACKAGING_DIR="docker-ce-packaging"
 mkdir $PACKAGING_DIR
@@ -60,46 +63,44 @@ git remote add origin  https://github.com/docker/docker-ce-packaging.git
 git fetch --depth 1 origin $PACKAGING_REF
 git checkout FETCH_HEAD
 
-
 echo "populate docker-ce-packaging/src folders"
-make REF=$REF checkout
+make DOCKER_VERS=$DOCKER_VERS checkout
 popd
 
-echo "building debs"
+
 pushd docker-ce-packaging/deb
 patchDockerFiles .
 DEB_LIST=`ls -1d debian-* ubuntu-*`
 for DEB in $DEB_LIST
 do
- echo ""
- echo "================================================="
- echo "==   Building for:$DEB                         =="
- echo "================================================="
+  echo ""
+  echo "================================================="
+  echo "==   Building for:$DEB                         =="
+  echo "================================================="
 
- VERSION=$REF make debbuild/bundles-ce-$DEB-ppc64le.tar.gz
+  VERSION=$DOCKER_VERS make debbuild/bundles-ce-$DEB-ppc64le.tar.gz
 done
 popd
 
-echo "building rpms"
 pushd docker-ce-packaging/rpm
 patchDockerFiles .
 RPM_LIST=`ls -1d fedora-* centos-*`
 for RPM in $RPM_LIST
 do
  
- echo ""
- echo "================================================="
- echo "==   Building for:$RPM                         =="
- echo "================================================="
+  echo ""
+  echo "================================================="
+  echo "==   Building for:$RPM                         =="
+  echo "================================================="
  
- VERSION=$REF make rpmbuild/bundles-ce-$RPM-ppc64le.tar.gz
+ VERSION=$DOCKER_VERS make rpmbuild/bundles-ce-$RPM-ppc64le.tar.gz
 done
 popd
 
  echo ""
  echo "================================================="
- echo "==   Copying packages to $BUILD_OUT_DIR        =="
+ echo "==   Copying packages to $DOCKER_DIR        =="
  echo "================================================="
 
-cp -r docker-ce-packaging/deb/debbuild/* $BUILD_OUT_DIR
-cp -r docker-ce-packaging/rpm/rpmbuild/* $BUILD_OUT_DIR
+cp -r docker-ce-packaging/deb/debbuild/* $DOCKER_DIR
+cp -r docker-ce-packaging/rpm/rpmbuild/* $DOCKER_DIR
