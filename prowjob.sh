@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_DOCKERD_ENTRYPOINT="/usr/local/bin/"
+PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
 PATH_DOCKERD_STARTING=""
 PATH_IMAGE_BUILD="quay.io/florencepascual"
 PATH_SCRIPT_BUILD=""
