@@ -6,6 +6,8 @@ DATE=`date +%d%m%y-%H%S`
 DOCKER_DIR="/docker-ce/docker-ce-$DATE"
 CONTAINERD_DIR="/docker-ce/containerd-$DATE"
 
+CONTAINERD_VERS='v1.4.9'
+
 
 mkdir $DOCKER_DIR
 
@@ -91,7 +93,7 @@ DISTROS="$DEB_LIST $RPM_LIST"
 
 for DISTRO in $DISTROS
 do
-	make REF=${TAG} docker.io/library/$DISTRO
+	make REF=${CONTAINERD_VERS} docker.io/library/$DISTRO
 done
 
 popd
