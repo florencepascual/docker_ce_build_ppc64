@@ -13,7 +13,7 @@ echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/container
 cat env.list
 
 # docker daemon
-bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
+# bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
 # wait for the dockerd to start
 . .${PATH_DOCKERD_STARTING}/dockerd-starting.sh
 # while the docker daemon is running
