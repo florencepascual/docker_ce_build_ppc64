@@ -13,7 +13,7 @@ PATH_SCRIPT_BUILD=""
 # path to test.sh, script to test docker-ce and containerd.
 PATH_SCRIPT_TEST="/test"
 
-# check if new versions of docker-ce and containerd
+# check if new versions of docker-ce and containerd or get the versions from the env.list
 # if monitoring docker-ce-packaging (no need of hash commits)
 echo DOCKER_VERS=\"`git ls-remote --refs --tags https://github.com/moby/moby.git | cut --delimiter='/' --fields=3 | grep 'v20' | sort --version-sort | tail --lines=1`\" > env.list
 echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list
