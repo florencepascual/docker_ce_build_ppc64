@@ -89,11 +89,11 @@ git clone https://github.com/docker/containerd-packaging.git
 
 pushd containerd-packaging
 
-DISTROS="$DEB_LIST $RPM_LIST"
+DISTROS="${DEB_LIST//-/:} ${RPM_LIST//-/:}"
 
 for DISTRO in $DISTROS
 do
-	make REF=${CONTAINERD_VERS} docker.io/library/$DISTRO
+	make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO}
 done
 
 popd
