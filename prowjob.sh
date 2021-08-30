@@ -1,16 +1,25 @@
 #!/bin/bash
 
-HASH
-
+# path to the dockerd-entrypoint.sh
 PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
+# path to the dockerd-starting.sh
 PATH_DOCKERD_STARTING=""
+# path to the check_env.sh
+PATH_CHECK_ENV=""
+# path to the image for building and testing
 PATH_IMAGE_BUILD="quay.io/florencepascual"
+# path to build.sh, script to build docker-ce and containerd
 PATH_SCRIPT_BUILD=""
+# path to test.sh, script to test docker-ce and containerd.
 PATH_SCRIPT_TEST="/test"
 
 # check if new versions of docker-ce and containerd
+# if monitoring docker-ce-packaging (no need of hash commits)
 echo DOCKER_VERS=\"`git ls-remote --refs --tags https://github.com/moby/moby.git | cut --delimiter='/' --fields=3 | grep 'v20' | sort --version-sort | tail --lines=1`\" > env.list
 echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list
+# if env.list in cos bucket, would need to connect through s3fs (CONTAINERD_VERS, DOCKER_VERS and PACKAGING_REF)
+PACKAGING_REF="5a28c77f52148f682ab1165dfcbbbad6537b148f"
+# if env.list in github, would need to push the get_distrib after getting it or run in each docker the script once again
 
 cat env.list
 
@@ -24,36 +33,17 @@ then
     # get the list of distros
     ./get_distrib.sh
     # check the env.list (versions of docker-ce, containerd and list of packages)
-    if [[ ! -f env.list ]]
-    # if there is no env.list
+    if [[ -f env.list ]]
+    # if there is env.list
     then
+        . .${PATH_CHECK_ENV}/check_env.sh
+
+        cat env.list
+    else
         echo "There is no env.list"
         exit 1
     fi
-    if ! grep -Fq "DOCKER_VERS" env.list
-    # if there is no docker_ce version
-    then
-        echo "There is no version of docker_ce"
-        exit 1
-    fi
-    if ! grep -Fq "CONTAINERD_VERS" env.list
-    # if there is no containerd version
-    then 
-        echo "There is no version of containerd"
-        exit 1
-    fi
-    if ! grep -Fq "DEB_LIST" env.list
-    # if there is no deb_list
-    then
-        echo "There is no distro in DEB"
-        exit 1
-    fi
-    if ! grep -Fq "RPM_LIST" env.list
-    # if there is no rpm_list
-    then 
-        echo "There is no distro in RPM"
-        exit 1
-    fi
+    
 
     # container to build docker-ce and containerd
     #CONT_NAME=docker-build
