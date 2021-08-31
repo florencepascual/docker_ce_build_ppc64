@@ -2,8 +2,14 @@
 
 echo $1
 
-case $1 in
-	env.list)
+if [ -n $1 ]
+then
+# otherwise make first arg as a rental
+    file=$1
+fi
+
+case $file in
+	"env.list")
         # file which we edit with DOCKER_VERS, CONTAINERD_VERS and PACKAGING_REF
 		echo "env.list"
         if ! grep -Fq "DOCKER_VERS" $1
@@ -25,7 +31,7 @@ case $1 in
             exit 1
         fi
 		;;
-	env_distrib.list)
+	"env-distrib.list")
 		echo "env_distrib.list"
 		if ! grep -Fq "DEB_LIST" $1
         # if there is no deb_list
