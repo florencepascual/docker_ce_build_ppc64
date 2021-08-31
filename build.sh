@@ -8,6 +8,10 @@ CONTAINERD_DIR="/docker-ce/containerd-$DATE"
 
 CONTAINERD_VERS='v1.4.9'
 
+ echo ""
+ echo "================================================="
+ echo "==   Building docker-ce                         =="
+ echo "================================================="
 
 mkdir $DOCKER_DIR
 
@@ -81,6 +85,11 @@ popd
 
 cp -r docker-ce-packaging/deb/debbuild/* $DOCKER_DIR
 cp -r docker-ce-packaging/rpm/rpmbuild/* $DOCKER_DIR
+
+ echo ""
+ echo "================================================="
+ echo "==   Building containerd                         =="
+ echo "================================================="
 
 mkdir $CONTAINERD_DIR
 
