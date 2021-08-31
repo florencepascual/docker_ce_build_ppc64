@@ -4,7 +4,6 @@ echo $1
 
 if [ -n $1 ]
 then
-# otherwise make first arg as a rental
     file=$1
 fi
 
