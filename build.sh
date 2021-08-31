@@ -1,21 +1,35 @@
 #/bin/bash
 
-DOCKER_VERS='v20.10.8'
-PACKAGING_REF='5a28c77f52148f682ab1165dfcbbbad6537b148f'
+if [[ ! -f env.list ]]
+then
+  DOCKER_VERS='v20.10.8'
+  CONTAINERD_VERS='v1.4.9'
+  PACKAGING_REF='5a28c77f52148f682ab1165dfcbbbad6537b148f'
+else
+  set -o allexport
+  source env.list
+fi
+
+if [[ ! -f env-distrib.list ]]
+then
+  DEB_LIST="debian-bullseye debian-buster ubuntu-bionic ubuntu-focal ubuntu-groovy ubuntu-hirsute"
+  RPM_LIST="centos-7 centos-8 fedora-33 fedora-34"
+else
+  set -o allexport
+  source env-distrib.list
+fi
+
 DATE=`date +%d%m%y-%H%S`
-DOCKER_DIR="/docker-ce/docker-ce-$DATE"
-CONTAINERD_DIR="/docker-ce/containerd-$DATE"
+DOCKER_DIR="/docker-ce-$DATE"
+CONTAINERD_DIR="/containerd-$DATE"
 
-CONTAINERD_VERS='v1.4.9'
 
- echo ""
- echo "================================================="
- echo "==   Building docker-ce                         =="
- echo "================================================="
+echo ""
+echo "================================================="
+echo "==   Building docker-ce                         =="
+echo "================================================="
 
 mkdir $DOCKER_DIR
-
-# DOCKER_VERS, CONTAINERD_VERS, DEB_LIST and RPM_LIST
 
 #Workaround for builkit cache issue where fedora-32/Dockerfile
 # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -31,10 +45,9 @@ patchDockerFiles() {
   done
 }
 
-echo "Populating docker-ce-packaging from git ref=$PACKAGING_REF"
-
 PACKAGING_DIR="docker-ce-packaging"
-mkdir $PACKAGING_DIR
+
+mkdir -p $PACKAGING_DIR
 pushd $PACKAGING_DIR
 
 git init
@@ -42,15 +55,11 @@ git remote add origin  https://github.com/docker/docker-ce-packaging.git
 git fetch --depth 1 origin $PACKAGING_REF
 git checkout FETCH_HEAD
 
-
-echo "populate docker-ce-packaging/src folders"
 make REF=$DOCKER_VERS checkout
 popd
 
-echo "building debs"
 pushd docker-ce-packaging/deb
 patchDockerFiles .
-DEB_LIST=`ls -1d debian-* ubuntu-*`
 for DEB in $DEB_LIST
 do
  echo ""
@@ -62,10 +71,8 @@ do
 done
 popd
 
-echo "building rpms"
 pushd docker-ce-packaging/rpm
 patchDockerFiles .
-RPM_LIST=`ls -1d fedora-* centos-*`
 for RPM in $RPM_LIST
 do
  
@@ -92,7 +99,6 @@ cp -r docker-ce-packaging/rpm/rpmbuild/* $DOCKER_DIR
  echo "================================================="
 
 mkdir $CONTAINERD_DIR
-
 
 git clone https://github.com/docker/containerd-packaging.git
 
