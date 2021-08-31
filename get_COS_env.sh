@@ -19,5 +19,7 @@ mkdir -p ${PATH_COS}/s3_$COS_BUCKET
 # mount the cos bucket
 s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
 
+ls ${PATH_COS}/s3_$COS_BUCKET
+
 # copy the env.list to the local /workspace
 cp ${PATH_COS}/s3_$COS_BUCKET/env.list /workspace/env.list
