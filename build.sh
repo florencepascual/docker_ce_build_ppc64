@@ -4,7 +4,7 @@ if [[ ! -f env.list ]]
 then
   DOCKER_VERS='v20.10.8'
   CONTAINERD_VERS='v1.4.9'
-  PACKAGING_REF='5a28c77f52148f682ab1165dfcbbbad6537b148f'
+  REF_PACKAGING='5a28c77f52148f682ab1165dfcbbbad6537b148f'
 else
   set -o allexport
   source env.list
@@ -20,8 +20,8 @@ else
 fi
 
 DATE=`date +%d%m%y-%H%S`
-DOCKER_DIR="/docker-ce-$DATE"
-CONTAINERD_DIR="/containerd-$DATE"
+DIR_DOCKER="/docker-ce-$DATE"
+DIR_CONTAINERD="/containerd-$DATE"
 
 
 echo ""
@@ -29,7 +29,7 @@ echo "================================================="
 echo "==   Building docker-ce                         =="
 echo "================================================="
 
-mkdir $DOCKER_DIR
+mkdir $DIR_DOCKER
 
 #Workaround for builkit cache issue where fedora-32/Dockerfile
 # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -45,14 +45,14 @@ patchDockerFiles() {
   done
 }
 
-PACKAGING_DIR="docker-ce-packaging"
+DIR_PACKAGING="docker-ce-packaging"
 
-mkdir -p $PACKAGING_DIR
-pushd $PACKAGING_DIR
+mkdir -p $DIR_PACKAGING
+pushd $DIR_PACKAGING
 
 git init
 git remote add origin  https://github.com/docker/docker-ce-packaging.git
-git fetch --depth 1 origin $PACKAGING_REF
+git fetch --depth 1 origin $REF_PACKAGING
 git checkout FETCH_HEAD
 
 make REF=$DOCKER_VERS checkout
@@ -87,18 +87,18 @@ popd
 
  echo ""
  echo "================================================="
- echo "==   Copying packages to $DOCKER_DIR        =="
+ echo "==   Copying packages to $DIR_DOCKER        =="
  echo "================================================="
 
-cp -r docker-ce-packaging/deb/debbuild/* $DOCKER_DIR
-cp -r docker-ce-packaging/rpm/rpmbuild/* $DOCKER_DIR
+cp -r docker-ce-packaging/deb/debbuild/* $DIR_DOCKER
+cp -r docker-ce-packaging/rpm/rpmbuild/* $DIR_DOCKER
 
  echo ""
  echo "================================================="
  echo "==   Building containerd                         =="
  echo "================================================="
 
-mkdir $CONTAINERD_DIR
+mkdir $DIR_CONTAINERD
 
 git clone https://github.com/docker/containerd-packaging.git
 
@@ -113,4 +113,4 @@ done
 
 popd
 
-cp -r containerd-packaging/build/* $CONTAINERD_DIR
+cp -r containerd-packaging/build/* $DIR_CONTAINERD
