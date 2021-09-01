@@ -43,7 +43,7 @@ cat env.list
 if [[ -f env.list ]]
 # if there is env.list
 then
-    . .${PATH_CHECK_ENV}/check_env.sh env.list
+    . .${DIR_GITHUB}/check_env.sh env.list
     cat env.list
     set -o allexport
     source env.list
