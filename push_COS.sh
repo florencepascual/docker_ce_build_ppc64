@@ -19,9 +19,10 @@ apt update && apt install -y s3fs
 mkdir -p ${PATH_COS}/s3_$COS_BUCKET
 # mount the cos bucket
 s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
+ls ${PATH_COS}/s3_$COS_BUCKET
 
 # copy the builds into the COS Bucket ibm-docker-builds
-if [[ -d ${PATH_COS}/s3_$COS_BUCKET/docker-ce-* ]]
+if [[ -d ${PATH_COS}/s3_${COS_BUCKET}/docker-ce-* ]]
 then
     # get the directory name "docker-ce-20.10-11" version without patch number then build tag
     # DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | sed -E 's|(v)([0-9.]+)([0-9]+)(.[0-9])|\2\3|'")

@@ -24,8 +24,8 @@ then
     case $env_source in
 	"files")
         # env.list from COS Bucket and env-distrib.list 
-        CONT_NAME=docker_s3_copy
-        docker run --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS_env.sh"
+        CONT_NAME2=docker_s3_env
+        docker run --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME2 debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS_env.sh"
 		;;
 	"no-files")
         # no files, we would monitor github repo and put the versions into an env.list
