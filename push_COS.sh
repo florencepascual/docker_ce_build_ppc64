@@ -30,7 +30,7 @@ then
     DOCKER_BUILD_TAG=$((DOCKER_LAST_BUILD_TAG+1))
     DIR_DOCKER=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
     # copy the package to the cos bucket
-    ech ${DIR_DOCKER}
+    echo ${DIR_DOCKER}
     # cp docker-ce-* ${PATH_COS}/s3_$COS_BUCKET/${DIR_DOCKER}
 fi
 if [[ -d ${PATH_COS}/s3_$COS_BUCKET/containerd-* ]]
