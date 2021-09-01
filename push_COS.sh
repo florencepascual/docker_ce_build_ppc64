@@ -16,13 +16,13 @@ chmod 600 ${PATH_PASSWORD}
 rm ${PATH_PASSWORD}_buffer
 apt update && apt install -y s3fs
 
-mkdir -p ${PATH_COS}/s3_$COS_BUCKET
+mkdir -p ${PATH_COS}/s3_${COS_BUCKET}
 # mount the cos bucket
 s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
-ls ${PATH_COS}/s3_$COS_BUCKET
 
+ls -d ${PATH_COS}/s3_${COS_BUCKET}/docker-ce-*/
 # copy the builds into the COS Bucket ibm-docker-builds
-if [[ -d "${PATH_COS}/s3_${COS_BUCKET}/docker-ce-*" ]]
+if [[ $? -eq 0 ]]
 then
     echo "1"
     # get the directory name "docker-ce-20.10-11" version without patch number then build tag
@@ -36,9 +36,17 @@ then
     DIR_DOCKER=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
     # copy the package to the cos bucket
     echo ${DIR_DOCKER}
-    # cp docker-ce-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_DOCKER}
+    # cp /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_DOCKER}
+else 
+    DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+    DOCKER_BUILD_TAG="1"
+    DIR_DOCKER=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
+    # copy the package to the cos bucket
+    echo ${DIR_DOCKER}
+    # cp /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_DOCKER}
 fi
-if [[ -d "${PATH_COS}/s3_${COS_BUCKET}/containerd-*" ]]
+ls -d ${PATH_COS}/s3_${COS_BUCKET}/containerd-*/
+if [[ $? -eq 0 ]]
 then
     echo "2"
     # get the directory name "containerd-1.4-9" version without patch number then build tag
@@ -52,6 +60,13 @@ then
     DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
     # copy the package to the cos bucket
     echo ${DIR_CONTAINERD}
-    # cp containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
+    # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
+else
+    DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+    CONTAINERD_BUILD_TAG="1"
+    DIR_CONTAINERD=docker-ce-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
+    # copy the package to the cos bucket
+    echo ${DIR_CONTAINERD}
+    # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
 fi
 
