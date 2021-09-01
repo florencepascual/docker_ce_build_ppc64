@@ -11,19 +11,22 @@ case $file in
 	"env.list")
         # file which we edit with DOCKER_VERS, CONTAINERD_VERS and PACKAGING_REF
 		echo "env.list"
-        if grep -FLq "DOCKER_VERS" $file
+        grep -FLq "DOCKER_VERS" $file
+        if [[ $? -eq 1 ]]
         # if there is no docker_ce version
         then
             echo "There is no version of docker_ce"
             exit 1
         fi
-        if grep -FLq "CONTAINERD_VERS" $file
+        grep -FLq "CONTAINERD_VERS" $file
+        if [[ $? -eq 1 ]]
         # if there is no containerd version
         then 
             echo "There is no version of containerd"
             exit 1
         fi
-        if grep -FLq "PACKAGING_REF" $file
+        grep -FLq "PACKAGING_REF" $file
+        if [[ $? -eq 1 ]]
         # if there is no reference of docker-ce-packaging (hash commit) 
         then
             echo "There is no reference of docker-ce-packaging"
@@ -32,13 +35,15 @@ case $file in
 		;;
 	"env-distrib.list")
 		echo "env_distrib.list"
-		if grep -FLq "DEB_LIST" $file
+        grep -FLq "DEB_LIST" $file
+		if [[ $? -eq 1 ]]
         # if there is no deb_list
         then
             echo "There is no distro in DEB"
             exit 1
         fi
-        if grep -FLq "RPM_LIST" $file
+        grep -FLq "RPM_LIST" $file
+        if [[ $? -eq 1 ]]
         # if there is no rpm_list
         then 
             echo "There is no distro in RPM"
