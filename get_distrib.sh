@@ -5,13 +5,15 @@ if [[ -d docker-ce-packaging ]]
 then
     rm -rf docker-ce-packaging
 fi
-
+mkdir docker-ce-packaging
+pushd docker-ce-packaging
 git init
 git remote add origin  https://github.com/docker/docker-ce-packaging.git
 git fetch --depth 1 origin $PACKAGING_REF
 git checkout FETCH_HEAD
 
 make REF=$DOCKER_VERS checkout
+popd
 
 if [[ ! -f env-distrib.list ]]
 # if there is no env.list file, create the file
