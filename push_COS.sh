@@ -34,6 +34,7 @@ then
     # cp /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_DOCKER}
     echo "${DIR_DOCKER} copied"
 else 
+    # there are no directories yet
     DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
     DOCKER_BUILD_TAG="1"
     DIR_DOCKER=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
@@ -41,24 +42,27 @@ else
     # cp /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_DOCKER}
     echo "${DIR_DOCKER} copied"
 fi
-ls -d ${PATH_COS}/s3_${COS_BUCKET}/containerd-*/
-if [[ $? -eq 0 ]]
+if [[ ${CONTAINERD_VERS} != "0" ]]
 then
-    # get the directory name "containerd-1.4-9" version without patch number then build tag
-    # DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | sed -E 's|(v)([0-9.]+)([0-9]+)(.[0-9])|\2\3|'")
-    DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
-    CONTAINERD_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET}/containerd-${DIR_CONTAINERD_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f5)
-    CONTAINERD_BUILD_TAG=$((CONTAINERD_LAST_BUILD_TAG+1))
-    DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
-    # copy the package to the cos bucket
-    # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
-    echo "${DIR_CONTAINERD} copied"
-else
-    DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
-    CONTAINERD_BUILD_TAG="1"
-    DIR_CONTAINERD=docker-ce-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
-    # copy the package to the cos bucket
-    # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
-    echo "${DIR_CONTAINERD} copied"
+    ls -d ${PATH_COS}/s3_${COS_BUCKET}/containerd-*/
+    if [[ $? -eq 0 ]]
+    then
+        # get the directory name "containerd-1.4-9" version without patch number then build tag
+        # DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | sed -E 's|(v)([0-9.]+)([0-9]+)(.[0-9])|\2\3|'")
+        DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+        CONTAINERD_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET}/containerd-${DIR_CONTAINERD_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f5)
+        CONTAINERD_BUILD_TAG=$((CONTAINERD_LAST_BUILD_TAG+1))
+        DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
+        # copy the package to the cos bucket
+        # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
+        echo "${DIR_CONTAINERD} copied"
+    else
+        # there are no directories yet
+        DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+        CONTAINERD_BUILD_TAG="1"
+        DIR_CONTAINERD=docker-ce-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
+        # copy the package to the cos bucket
+        # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET}/${DIR_CONTAINERD}
+        echo "${DIR_CONTAINERD} copied"
+    fi
 fi
-
