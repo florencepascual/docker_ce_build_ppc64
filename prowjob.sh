@@ -77,7 +77,7 @@ docker run --rm --env SECRET_S3 -it -v /workspace:/workspace --privileged --name
     # container to build docker-ce and containerd
     CONT_NAME=docker-build
     docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
-    docker run --env-file /workspace/env.list --env-file /workspace/env-distrib.list -it -v /workspace:/workspace --privileged --name $CONT_NAME docker_ce_build /bin/bash -c "$/workspace/${DIR_GITHUB}/build.sh"
+    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env  -it -v /workspace:/workspace --privileged --name $CONT_NAME docker_ce_build /bin/bash -c "$/workspace/${DIR_GITHUB}/build.sh"
 
     # store the new versions in the cos bucket ppc64le (or in the container ?)
 

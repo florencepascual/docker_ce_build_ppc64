@@ -4,7 +4,7 @@ if [[ ! -f env.list ]]
 then
   DOCKER_VERS='v20.10.8'
   CONTAINERD_VERS='v1.4.9'
-  REF_PACKAGING='5a28c77f52148f682ab1165dfcbbbad6537b148f'
+  PACKAGING_REF='5a28c77f52148f682ab1165dfcbbbad6537b148f'
 else
   set -o allexport
   source env.list
@@ -52,7 +52,7 @@ pushd $DIR_PACKAGING
 
 git init
 git remote add origin  https://github.com/docker/docker-ce-packaging.git
-git fetch --depth 1 origin $REF_PACKAGING
+git fetch --depth 1 origin $PACKAGING_REF
 git checkout FETCH_HEAD
 
 make REF=$DOCKER_VERS checkout
