@@ -73,12 +73,12 @@ then
     patchDockerFiles .
     for DEB in ${DEBS}
     do
-    echo ""
-    echo "================================================="
-    echo "==   Building for:${DEB}                         =="
-    echo "================================================="
+      echo ""
+      echo "================================================="
+      echo "==   Building for:${DEB}                         =="
+      echo "================================================="
 
-    VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
+      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
     popd
 
@@ -86,13 +86,12 @@ then
     patchDockerFiles .
     for RPM in ${RPMS}
     do
-    
-    echo ""
-    echo "================================================="
-    echo "==   Building for:${RPM}                         =="
-    echo "================================================="
-    
-    VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
+      echo ""
+      echo "================================================="
+      echo "==   Building for:${RPM}                         =="
+      echo "================================================="
+
+      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
     popd
 
