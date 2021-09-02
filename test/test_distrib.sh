@@ -22,11 +22,24 @@
 ##
 #List of RPM based and DEB based distros to test
 ##
-RPMS="fedora:33 fedora:34 centos:7 centos:8"
-DEBS="debian:bullseye debian:buster\
+RPM_LIST="fedora:33 fedora:34 centos:7 centos:8"
+DEB_LIST="debian:bullseye debian:buster\
       ubuntu:bionic ubuntu:focal ubuntu:groovy ubuntu:hirsute"
 
 LOCAL_WEB_SERVER="pwr-rt-bionic1:8080"
+
+
+. ./docker_ce_build_ppc64/dockerd-starting.sh
+if ! test -d /root/.docker 
+  then
+    mkdir /root/.docker
+    echo "$SECRET_AUTH" > /root/.docker/config.json
+  fi
+  if grep -Fq "index.docker.io" /root/.docker/config.json
+  then
+  # docker login
+    if [ ! -z "$pid" ]
+    then
 
 if [[ ! -d "result" ]] ; then mkdir result; fi
 if [[ ! -d "tmp" ]] ; then mkdir tmp; fi
@@ -40,48 +53,8 @@ pushd tmp
 ##
 # Populate launch test script to be included in the test image
 ##
-cat <<'EOF'> launch_test.sh
-#/bin/bash
+PACKTYPE="${RPMS} ${DEBS}"
 
-set -ue
-
-echo "Waiting fo docerkd to start"
-TIMEOUT=10
-DAEMON="dockerd"
-i=0
-while [ $i -lt $TIMEOUT ] && ! /usr/bin/pgrep $DAEMON
-do
-  echo "Number: $i"
-  i=$((i+1))
-  sleep 2
-done
-
-pid=`/usr/bin/pgrep $DAEMON`
-if [ -z "$pid" ] ; then
-  echo "$DAEMON did not started after $(($TIMEOUT*2)) seconds"
-  exit 1
-
-else
-  echo "Found $DAEMON pid:$pid"
-fi
-
-
-ps -aef | grep docker | grep -v grep
-sleep 10
-ps -aef
-
-echo "Launching docker info"
-docker info
-
-
-echo "Starting the docker test suite for:$1"
-export GOPATH=${WORKSPACE}/test:/go
-export GO111MODULE=auto
-cd /workspace/test/src/github.ibm.com/powercloud/dockertest
-make test WHAT="./tests/$1" GOFLAGS="-v"
-
-echo "End of the docker test suite"
-EOF
 
 for PACKTYPE in RPMS DEBS; do
   echo "* Looking for distro type: $PACKTYPE"
@@ -98,8 +71,7 @@ for PACKTYPE in RPMS DEBS; do
     TEST_LOG=test_${DISTRO_NAME}_${DISTRO_VER}.log
 
     echo "*** Building the test image: $IMAGE_NAME"
-    docker build -t $IMAGE_NAME --build-arg DISTRO_NAME=$DISTRO_NAME --build-arg DISTRO_VER=$DISTRO_VER \
-          --build-arg LOCAL_WEB_SERVER=$LOCAL_WEB_SERVER . &> ../result/$BUILD_LOG
+    docker build -t $IMAGE_NAME --build-arg DISTRO_NAME=$DISTRO_NAME --build-arg DISTRO_VER=$DISTRO_VER  . &> ../result/$BUILD_LOG
 
     if [[ $? -ne 0 ]]; then
       echo "ERROR: docker build failed for $DISTRO, see details below from '$BUILD_LOG'"
