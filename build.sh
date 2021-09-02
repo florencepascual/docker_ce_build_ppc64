@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./${DIR_GITHUB}/dockerd-starting.sh
+. ./docker_ce_build_ppc64/dockerd-starting.sh
 
 if [ ! -z "$pid" ]
 then
