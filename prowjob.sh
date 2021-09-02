@@ -70,12 +70,16 @@ then
         exit 1
     fi
 
-    
-docker run --rm --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS_env.sh"
     # container to build docker-ce and containerd
     CONT_NAME=docker-build
     docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
-    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEB_LIST --env RPM_LIST -it -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build /bin/bash -c "/workspace/${DIR_GITHUB}/build.sh"
+
+    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH -d -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
+    # https://nickjanetakis.com/blog/docker-tip-80-waiting-for-detached-containers-to-finish and stop the containers
+    # container to test the packages
+    docker run --env DEBS --env RPMS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
 
     # store the new versions in the cos bucket ppc64le (or in the container ?)
 
