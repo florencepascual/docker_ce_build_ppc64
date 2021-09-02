@@ -35,16 +35,16 @@ case $file in
 		;;
 	"env-distrib.list")
 		echo "env_distrib.list"
-        grep -FLq "DEB_LIST" $file
+        grep -FLq "DEBS" $file
 		if [[ $? -eq 1 ]]
-        # if there is no deb_list
+        # if there is no DEBS
         then
             echo "There is no distro in DEB"
             exit 1
         fi
-        grep -FLq "RPM_LIST" $file
+        grep -FLq "RPMS" $file
         if [[ $? -eq 1 ]]
-        # if there is no rpm_list
+        # if there is no RPMS
         then 
             echo "There is no distro in RPM"
             exit 1

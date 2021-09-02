@@ -20,17 +20,17 @@ if [[ ! -f env-distrib.list ]]
 then
     touch env-distrib.list
 else
-# if there is already DEB_LIST or RPM_LIST, remove these lines
-    if grep -Fq "DEB_LIST" env-distrib.list
+# if there is already DEBS or RPMS, remove these lines
+    if grep -Fq "DEBS" env-distrib.list
     then
-        sed -i '/^DEB_LIST/d' env-distrib.list
+        sed -i '/^DEBS/d' env-distrib.list
     fi
-    if grep -Fq "RPM_LIST" env-distrib.list
+    if grep -Fq "RPMS" env-distrib.list
     then 
-        sed -i '/^RPM_LIST/d' env-distrib.list
+        sed -i '/^RPMS/d' env-distrib.list
     fi
 fi
 
 # get the packages list in the env_distrib.list
-echo DEB_LIST=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env-distrib.list
-echo RPM_LIST=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env-distrib.list
+echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env-distrib.list
+echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env-distrib.list

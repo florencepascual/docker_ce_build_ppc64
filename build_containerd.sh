@@ -8,11 +8,11 @@ if [ ! -d "$BUILD_OUT_DIR" ]; then
   mkdir $CONTAINERD_DIR
 fi
 
-# CONTAINERD_VERS, DEB_LIST and RPM_LIST
+# CONTAINERD_VERS, DEBS and RPMS
 
 pushd containerd-packaging
 
-DISTROS="${DEB_LIST} ${RPM_LIST}"
+DISTROS="${DEBS} ${RPMS}"
 
 for DISTRO in $DISTROS
 do

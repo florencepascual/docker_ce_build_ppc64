@@ -29,7 +29,7 @@ DATE=`date +%d%m%y-%H%S`
 DOCKER_DIR="/docker-ce/docker-ce-$DATE"
 
 
-# DOCKER_VERS, DEB_LIST and RPM_LIST
+# DOCKER_VERS, DEBS and RPMS
 
 #Workaround for builkit cache issue where fedora-32/Dockerfile
 # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -70,8 +70,8 @@ popd
 
 pushd docker-ce-packaging/deb
 patchDockerFiles .
-DEB_LIST=`ls -1d debian-* ubuntu-*`
-for DEB in $DEB_LIST
+DEBS=`ls -1d debian-* ubuntu-*`
+for DEB in $DEBS
 do
   echo ""
   echo "================================================="
@@ -84,8 +84,8 @@ popd
 
 pushd docker-ce-packaging/rpm
 patchDockerFiles .
-RPM_LIST=`ls -1d fedora-* centos-*`
-for RPM in $RPM_LIST
+RPMS=`ls -1d fedora-* centos-*`
+for RPM in $RPMS
 do
  
   echo ""
