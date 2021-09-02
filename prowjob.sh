@@ -5,8 +5,6 @@ PATH_GITHUB="https://github.com/florencepascual/docker_ce_build_ppc64.git"
 DIR_GITHUB="docker_ce_build_ppc64"
 # path to the dockerd-entrypoint.sh
 PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
-# path to the dockerd-starting.sh
-PATH_DOCKERD_STARTING=""
 # path to the image for building and testing
 PATH_IMAGE_BUILD="quay.io/florencepascual"
 # path to test.sh, script to test docker-ce and containerd.
@@ -43,7 +41,7 @@ cat env.list
 if [[ -f env.list ]]
 # if there is env.list
 then
-    . .${DIR_GITHUB}/check_env.sh env.list
+    source ./${DIR_GITHUB}/check_env.sh env.list
     cat env.list
     set -o allexport
     source env.list
@@ -55,15 +53,15 @@ fi
 # docker daemon to be enabled in the pod not for testing
 # bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
 # wait for the dockerd to start
-. .${PATH_DOCKERD_STARTING}/dockerd-starting.sh
+source ./${DIR_GITHUB}/dockerd-starting.sh
 # while the docker daemon is running
 if [ ! -z "$pid" ]
 then
     # get the list of distros
-    . ./${DIR_GITHUB}/get_distrib.sh
+    source ./${DIR_GITHUB}/get_distrib.sh
     if [[ -f env-distrib.list ]]
     then
-        . .${PATH_CHECK_ENV}/check_env.sh env-distrib.list
+        source ./${DIR_GITHUB}/check_env.sh env-distrib.list
         cat env-distrib.list
         set -o allexport
         source env-distrib.list

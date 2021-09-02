@@ -1,7 +1,6 @@
 #!/bin/bash
 
-dockerd-entrypoint.sh &
-. .${PATH_DOCKERD_STARTING}/dockerd-starting.sh
+. ./${DIR_GITHUB}/dockerd-starting.sh
 
 if [ ! -z "$pid" ]
 then
