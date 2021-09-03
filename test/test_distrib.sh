@@ -18,12 +18,12 @@ fi
 if ! test -d /root/.docker 
   then
     mkdir /root/.docker
-    echo "$SECRET_AUTH" > /root/.docker/config.json
+    echo "${SECRET_AUTH}" > /root/.docker/config.json
   fi
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
   # docker login
-    if [ ! -z "$pid" ]
+    if [ ! -z "${pid}" ]
     then
       if [[ ! -d "result" ]] ; then mkdir result; fi
       if [[ ! -d "tmp" ]] ; then mkdir tmp; fi
@@ -50,35 +50,35 @@ if ! test -d /root/.docker
           docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VER=${DISTRO_VER}  . &> ../result/${BUILD_LOG}
 
           if [[ $? -ne 0 ]]; then
-            echo "ERROR: docker build failed for $DISTRO, see details below from '$BUILD_LOG'"
+            echo "ERROR: docker build failed for ${DISTRO}, see details below from '${BUILD_LOG}'"
             continue
           fi
 
-          echo "*** Runing the tests from the container: $CONT_NAME"
+          echo "*** Runing the tests from the container: ${CONT_NAME}"
           docker run -dt --env SECRET_AUTH -v /workspace/docker-ce:/workspace/docker-ce -v /workspace/containerd:/workspace/containerd -v /workspace/dockertest:/workspace/dockertest --privileged --name ${CONT_NAME} ${IMAGE_NAME}
 
           if [[ $? -ne 0 ]]; then
-            echo "ERROR: docker run failed for $DISTRO. Calling docker logs $CONT_NAME"
-            docker logs $CONT_NAME &> ../result/${RUN_LOG}
+            echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
+            docker logs ${CONT_NAME} &> ../result/${RUN_LOG}
 
-            echo "*** Cleanup: $CONT_NAME"
-            docker stop $CONT_NAME
-            docker rm $CONT_NAME
+            echo "*** Cleanup: ${CONT_NAME}"
+            docker stop ${CONT_NAME}
+            docker rm ${CONT_NAME}
             continue
           fi
 
-          docker exec $CONT_NAME /bin/bash /test_launch.sh $DISTRO_NAME  &> ../result/$TEST_LOG
+          docker exec ${CONT_NAME} /bin/bash /test_launch.sh ${DISTRO_NAME}  &> ../result/$TEST_LOG
           if [[ $? -ne 0 ]]; then
-            echo "ERROR: The test suite failed for $DISTRO. See details below from '$TEST_LOG'"
+            echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
           fi
 
-          echo "*** Grepping for any potential tests errors from $TEST_LOG"
-          grep -i err  ../result/$TEST_LOG
+          echo "*** Grepping for any potential tests errors from ${TEST_LOG}"
+          grep -i err  ../result/${TEST_LOG}
 
-          echo "*** Cleanup: $CONT_NAME"
-          docker stop $CONT_NAME
-          docker rm $CONT_NAME
-          docker image rm $IMAGE_NAME
+          echo "*** Cleanup: ${CONT_NAME}"
+          docker stop ${CONT_NAME}
+          docker rm ${CONT_NAME}
+          docker image rm ${IMAGE_NAME}
         done
 
         rm Dockerfile
@@ -87,7 +87,7 @@ if ! test -d /root/.docker
       #popd (tmp)
       popd
 
-      cp -r result  ${DIR_TEST}
+      cp -r result/*  ${DIR_TEST}
 
     fi
   fi

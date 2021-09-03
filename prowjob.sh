@@ -14,7 +14,7 @@ PATH_SCRIPT_TEST="/test"
 git clone ${PATH_GITHUB}
 chmod +x ${DIR_GITHUB}/*.sh
 
-# get the env file and the dockertest repo
+# get the env file and the dockertest repo and the latest built of containerd if we don't want to build containerd
 CONT_NAME=docker_s3_env
 docker run --rm --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
 
@@ -65,16 +65,20 @@ then
     docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH -d -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build
     docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
     # https://nickjanetakis.com/blog/docker-tip-80-waiting-for-detached-containers-to-finish and stop the containers
+    
+    if [[ ${CONTAINERD_VERS} = "0" ]]
+    # if we don't want to build containerd, we need to get the latest built from the COS Bucket
+    then
+
+
+    fi
+
     # container to test the packages
-    docker run --env DEBS --env RPMS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build
-    docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
+    CONT_NAME=docker-test
+    docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker exec -dt ${CONT_NAME} bash -c "/workspace/${DIR_GITHUB}/test/test_distrib.sh"
 
-    # store the new versions in the cos bucket ppc64le (or in the container ?)
-
-    # container to test docker-ce and containerd
-    #CONT_NAME=docker-test
-    # !!!! PRENDRE EN COMPTE SECRET
-    #docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build .${PATH_SCRIPT_TEST}/test.sh
+    docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build .${PATH_SCRIPT_TEST}/test.sh
     # check tests
 
     # push to cos bucket ibm-docker-builds and change ppc64le-docker if no error

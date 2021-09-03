@@ -24,3 +24,12 @@ cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/env.list /workspace/env.list
 
 # copy the dockertest repo to the local /workspace
 cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/dockertest /workspace/dockertest
+
+# copy the latest built of containerd if CONTAINERD_VERS = "0"
+set -o allexport
+source ${PATH_COS}/s3_$COS_BUCKET/prow-docker/env.list
+
+if [[ ${CONTAINERD_VERS} = "0" ]]
+then
+    cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/containerd-* /workspace/
+fi

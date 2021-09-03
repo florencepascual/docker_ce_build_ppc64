@@ -4,9 +4,11 @@ set -o allexport
 source env.list
 source env-distrib.list
 
-DIR_DOCKER="/workspace/docker-ce"
-DIR_CONTAINERD="/workspace/containerd"
-
+DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
+if [[ ${CONTAINERD_VERS} != "0" ]]
+then
+  DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
+fi
 
 . ./docker_ce_build_ppc64/dockerd-starting.sh
 if ! test -d /root/.docker 
@@ -42,7 +44,7 @@ then
 
     DIR_PACKAGING="docker-ce-packaging"
 
-    mkdir -p $DIR_PACKAGING
+    mkdir -p ${DIR_PACKAGING}
     pushd ${DIR_PACKAGING}
 
     git init
@@ -86,6 +88,7 @@ then
 
     cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
+    rm -rf docker-ce-packaging
 
     ls ${DIR_DOCKER}/*
     if [[ $? -ne 0 ]]
@@ -121,6 +124,7 @@ then
       popd
 
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
+      rm -rf containerd-packaging
 
       ls ${DIR_CONTAINERD}/*
       if [[ $? -ne 0 ]]
