@@ -2,14 +2,8 @@
 
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64"
 
-if [[ ! -f env-distrib.list ]]
-then
-  DEBS="debian-bullseye debian-buster ubuntu-bionic ubuntu-focal ubuntu-groovy ubuntu-hirsute"
-  RPMS="centos-7 centos-8 fedora-33 fedora-34"
-else
-  set -o allexport
-  source env-distrib.list
-fi
+set -o allexport
+source env-distrib.list
 
 DIR_TEST="/test"
 PATH_TEST="docker_ce_build_ppc64/test"
