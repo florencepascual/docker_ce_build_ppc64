@@ -1,20 +1,10 @@
-#docker build -t als_test_centos8 --build-arg DISTRO_NAME=centos --build-arg DISTRO_VER=8 .
-#docker build --build-arg IMAGE=$DISTRIB:$DISTROS --build-arg DISTRO=$DISTROS --build-arg DISTRIB=$DISTRIB . >> outputtemps.txt
-#DISTRO_NAME=ubuntu; DISTRO_VER=bionic; docker build -t als_test_${DISTRO_VER}_${DISTRO_NAME} --build-arg DISTRO_NAME=$DISTRO_NAME --build-arg DISTRO_VER=$DISTRO_VER > build_${DISTRO_VER}_${DISTRO_NAME}.log .2>&1
-#docker run -d -v ~/docker-ce:/docker-ce -v ~/.docker:/root/.docker --privileged  --name als_run_${DISTRO_VER}_${DISTRO_NAME} als_test_${DISTRO_VER}_${DISTRO_NAME}
-
-ARG DISTRO_NAME=debian
-ARG DISTRO_VER=buster
-ARG DOCKER_CE_VER=20.10.6-3
-ARG CONTAINERD_VER=1.4.4-3.1
+# Dockerfile for testing DEBs
 
 ARG GOLANG_VERSION=1.15.2
 
 FROM ppc64le/$DISTRO_NAME:$DISTRO_VER
 
 ARG GOLANG_VERSION
-ARG DOCKER_CE_VER
-ARG CONTAINERD_VER
 ARG DISTRO_NAME
 ARG DISTRO_VER
 
