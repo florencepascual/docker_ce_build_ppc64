@@ -14,26 +14,14 @@ PATH_SCRIPT_TEST="/test"
 git clone ${PATH_GITHUB}
 chmod +x ${DIR_GITHUB}/*.sh
 
-#if $1
-#then
-#    env_source=$1
-#    case $env_source in
-#	"files")
-        # env.list from COS Bucket and env-distrib.list 
+# get the env file and the dockertest repo
 CONT_NAME=docker_s3_env
-docker run --rm --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS_env.sh"
-#		;;
-#	"no-files")
-#        # no files, we would monitor github repo and put the versions into an env.list
-#        echo DOCKER_VERS=\"`git ls-remote --refs --tags https://github.com/moby/moby.git | cut --delimiter='/' --fields=3 | grep 'v20' | sort --version-sort | tail --lines=1`\" > env.list
-#        echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list
-#		# check COS Bucket to see if DOCKER_VERS and CONTAINERD_VERS are new versions
-#       ;;
-#	*)
-#		echo "There is no argument valid"
-#        exit 1
-#		;;
-#  esac
+docker run --rm --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
+
+# if we monitor github repo and put the versions into an env.list
+#echo DOCKER_VERS=\"`git ls-remote --refs --tags https://github.com/moby/moby.git | cut --delimiter='/' --fields=3 | grep 'v20' | sort --version-sort | tail --lines=1`\" > env.list
+#echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list
+# check COS Bucket to see if DOCKER_VERS and CONTAINERD_VERS are new versions
 
 cat env.list
 
