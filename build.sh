@@ -1,27 +1,11 @@
 #!/bin/bash
 
-if [[ ! -f env.list ]]
-then
-  DOCKER_VERS='v20.10.8'
-  CONTAINERD_VERS='v1.4.9'
-  PACKAGING_REF='5a28c77f52148f682ab1165dfcbbbad6537b148f'
-else
-  set -o allexport
-  source env.list
-fi
+set -o allexport
+source env.list
+source env-distrib.list
 
-if [[ ! -f env-distrib.list ]]
-then
-  DEBS="debian-bullseye debian-buster ubuntu-bionic ubuntu-focal ubuntu-groovy ubuntu-hirsute"
-  RPMS="centos-7 centos-8 fedora-33 fedora-34"
-else
-  set -o allexport
-  source env-distrib.list
-fi
-
-DATE=`date +%d%m%y-%H%S`
-DIR_DOCKER="/workspace/docker-ce-$DATE"
-DIR_CONTAINERD="/workspace/containerd-$DATE"
+DIR_DOCKER="/workspace/docker-ce"
+DIR_CONTAINERD="/workspace/containerd"
 
 
 . ./docker_ce_build_ppc64/dockerd-starting.sh

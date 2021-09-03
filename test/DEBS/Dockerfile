@@ -10,16 +10,16 @@ ARG CONTAINERD_VER=1.4.4-3.1
 
 ARG GOLANG_VERSION=1.15.2
 
-ARG LOCAL_WEB_SERVER="pwr-rt-bionic1:8080"
-
 FROM ppc64le/$DISTRO_NAME:$DISTRO_VER
 
-ARG LOCAL_WEB_SERVER
 ARG GOLANG_VERSION
 ARG DOCKER_CE_VER
 ARG CONTAINERD_VER
 ARG DISTRO_NAME
 ARG DISTRO_VER
+
+RUN echo $DISTRO_NAME
+RUN echo $DISTRO_VER
 
 WORKDIR /workspace
 RUN mkdir -p /workspace
@@ -52,10 +52,11 @@ RUN if [ -f /bin/rpm  ] ; \
         rm -rf /var/lib/apt/lists/* ;\
     fi
 
-RUN set -eux;wget ${LOCAL_WEB_SERVER}/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz &&\
-    tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
-    wget -r -nd -Appc64el.deb ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64el/ &&\
-    dpkg -i *.deb
+RUN set -eux; \
+        cp /workspace/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz /workspace/ &&\
+        tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
+        cp /workspace/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64el/* /workspace/ &&\
+        dpkg -i *.deb
 
 ##
 #Docker in Docker inspired from
@@ -80,13 +81,6 @@ RUN set -eux; \
     wget https://raw.githubusercontent.com/docker-library/docker/094faa88f437cafef7aeb0cc36e75b59046cc4b9/20.10/dind/dockerd-entrypoint.sh;\
     chmod +x dockerd-entrypoint.sh;\
     mv dockerd-entrypoint.sh /usr/local/bin
-
-RUN set -eux; \
-    OUTDIR=${WORKSPACE}/test/src/github.ibm.com/powercloud ; \
-    mkdir -p $OUTDIR && cd $OUTDIR &&\
-    wget http://${LOCAL_WEB_SERVER}/dockertest.tar.gz &&\
-    tar -xvzf dockertest.tar.gz &&\
-    rm dockertest.tar.gz
 
 RUN set -eux; \
 	url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz";\
