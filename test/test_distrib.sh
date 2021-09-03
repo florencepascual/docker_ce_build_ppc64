@@ -1,11 +1,6 @@
 #/bin/bash
 
-##
-#set -eux
-
-##
-#List of RPM based and DEB based distros to test
-##
+PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64"
 
 if [[ ! -f env-distrib.list ]]
 then
@@ -16,8 +11,7 @@ else
   source env-distrib.list
 fi
 
-DATE=`date +%d%m%y-%H%S`
-DIR_TEST="/test-${DATE}"
+DIR_TEST="/test"
 PATH_TEST="docker_ce_build_ppc64/test"
 
 
@@ -45,7 +39,7 @@ if ! test -d /root/.docker
       for PACKTYPE in RPMS DEBS
       do
         echo "* Looking for distro type: ${PACKTYPE}"
-        cp ../${PACKTYPE}/Dockerfile .
+        cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile .
 
         for DISTRO in ${PACKTYPE} ; do
 
@@ -55,6 +49,7 @@ if ! test -d /root/.docker
           IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VER}"
           CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VER}"
           BUILD_LOG="build_${DISTRO_NAME}_${DISTRO_VER}.log"
+          RUN_LOG="run_${DISTRO_NAME}_${DISTRO_VER}.log"
           TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VER}.log"
 
           echo "*** Building the test image: ${IMAGE_NAME}"
@@ -62,16 +57,15 @@ if ! test -d /root/.docker
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker build failed for $DISTRO, see details below from '$BUILD_LOG'"
-            tail ../result/$BUILD_LOG
             continue
           fi
 
           echo "*** Runing the tests from the container: $CONT_NAME"
-          docker run -d -v ~/.docker:/root/.docker --privileged  --name $CONT_NAME $IMAGE_NAME
+          docker run -dt --env SECRET_AUTH -v /workspace/docker-ce:/workspace/docker-ce -v /workspace/containerd:/workspace/containerd -v /workspace/dockertest:/workspace/dockertest --privileged --name ${CONT_NAME} ${IMAGE_NAME}
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker run failed for $DISTRO. Calling docker logs $CONT_NAME"
-            docker logs $CONT_NAME
+            docker logs $CONT_NAME &> ../result/${RUN_LOG}
 
             echo "*** Cleanup: $CONT_NAME"
             docker stop $CONT_NAME
@@ -79,10 +73,9 @@ if ! test -d /root/.docker
             continue
           fi
 
-          docker exec $CONT_NAME /bin/bash /launch_test.sh $DISTRO_NAME  &> ../result/$TEST_LOG
+          docker exec $CONT_NAME /bin/bash /test_launch.sh $DISTRO_NAME  &> ../result/$TEST_LOG
           if [[ $? -ne 0 ]]; then
             echo "ERROR: The test suite failed for $DISTRO. See details below from '$TEST_LOG'"
-            tail ../result/$TEST_LOG
           fi
 
           echo "*** Grepping for any potential tests errors from $TEST_LOG"
