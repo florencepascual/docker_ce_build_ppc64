@@ -20,16 +20,16 @@ mkdir -p ${PATH_COS}/s3_$COS_BUCKET
 s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
 
 # copy the env.list to the local /workspace
-cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/env.list /workspace/env.list
+cp ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/env.list /workspace/env.list
 
 # copy the dockertest repo to the local /workspace
-cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/dockertest /workspace/dockertest
+cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/dockertest
 
 # copy the latest built of containerd if CONTAINERD_VERS = "0"
 set -o allexport
-source ${PATH_COS}/s3_$COS_BUCKET/prow-docker/env.list
+source ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/env.list
 
 if [[ ${CONTAINERD_VERS} = "0" ]]
 then
-    cp ${PATH_COS}/s3_$COS_BUCKET/prow-docker/containerd-* /workspace/
+    cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/containerd-* /workspace/
 fi

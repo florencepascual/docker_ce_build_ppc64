@@ -10,6 +10,15 @@ PATH_IMAGE_BUILD="quay.io/florencepascual"
 # path to test.sh, script to test docker-ce and containerd.
 PATH_SCRIPT_TEST="/test"
 
+
+# docker daemon to be enabled in the pod not for testing
+# bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
+# wait for the dockerd to start
+source ./${DIR_GITHUB}/dockerd-starting.sh
+
+mkdir /root/.docker
+echo "${SECRET_AUTH}" > /root/.docker/config.json
+
 # get env files or generate them
 git clone ${PATH_GITHUB}
 chmod +x ${DIR_GITHUB}/*.sh
@@ -38,10 +47,7 @@ else
     exit 1
 fi
 
-# docker daemon to be enabled in the pod not for testing
-# bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
-# wait for the dockerd to start
-source ./${DIR_GITHUB}/dockerd-starting.sh
+
 # while the docker daemon is running
 if [ ! -z "$pid" ]
 then
