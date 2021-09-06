@@ -209,3 +209,15 @@ Prow:
 #echo "$LAST_BUILD_TAG $NEXT_BUILD_TAG"
 #cd --
 ```
+
+
+## Automation
+
+### Test
+
+```
+git pull https://github.com/florencepascual/test-infra-test 
+kubectl delete pod/test-als-all-in-one-pod
+kubectl apply -f test-infra-test/pod-dnd/pod-secret-s3-docker.yaml
+kubectl exec -it pod/test-als-all-in-one-pod -- /bin/bash
+```
