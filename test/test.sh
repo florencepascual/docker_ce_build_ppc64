@@ -1,11 +1,10 @@
 #/bin/bash
 
-
-
 set -o allexport
+source env.list
 source env-distrib.list
 
-PATH_TEST="/workspace/test"
+PATH_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/test"
 
 if ! test -d ${PATH_TEST}
