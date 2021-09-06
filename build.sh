@@ -1,5 +1,10 @@
 #!/bin/bash
 
+stop_docker_daemon() {
+  ps -e | grep ${DAEMON}
+  kill -9 ${pid}
+}
+
 set -o allexport
 source env.list
 source env-distrib.list
@@ -141,16 +146,19 @@ then
       then
         echo "No packages built for docker and for containerd"
         exit 1
+        stop_docker_daemon
       elif [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
       # if there is no packages built for docker or no packages built for containerd
       then 
         echo "No packages built for either docker, or containerd"
         exit 1
+        stop_docker_daemon
       elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
       # if there are packages built for docker and packages built for containerd
       then
         echo "All packages built"
         exit 0
+        stop_docker_daemon
       fi
     else
       # if CONTAINERD_VERS="0"
@@ -159,9 +167,11 @@ then
       then
         "No packages built for docker"
         exit 1
+        stop_docker_daemon
       else
         "Packages built for docker"
         exit 0
+        stop_docker_daemon
       fi
     fi
   fi
