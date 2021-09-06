@@ -26,7 +26,7 @@ if [[ $? -eq 0]]
     # copy the builds into the COS Bucket ppc64le-docker
     DIR_DOCKER_PRIVATE=docker-ce-${DOCKER_VERS}
     # copy the package to the cos bucket
-    # cp /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/docker-ce/${DIR_DOCKER_PRIVATE}
+    # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/docker-ce/${DIR_DOCKER_PRIVATE}
     echo "${DIR_DOCKER_PRIVATE} copied"
 fi
 
@@ -38,7 +38,7 @@ then
         # copy the builds in the COS bucket ppc64le-docker
         DIR_CONTAINERD_PRIVATE=containerd-${CONTAINERD_VERS}
         # copy the package to the cos bucket
-        # cp /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/docker-ce/${DIR_CONTAINERD_PRIVATE}
+        # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/docker-ce/${DIR_CONTAINERD_PRIVATE}
         echo "${DIR_CONTAINERD_PRIVATE} copied"
     fi
 fi

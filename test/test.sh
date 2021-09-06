@@ -46,7 +46,7 @@ if ! test -d /root/.docker
           TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VER}.log"
 
           echo "*** Building the test image: ${IMAGE_NAME}"
-          docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VER=${DISTRO_VER}  . &> /workspace/test/${BUILD_LOG}
+          docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VER=${DISTRO_VER}  . &> ${PATH_TEST}/${BUILD_LOG}
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker build failed for ${DISTRO}, see details below from '${BUILD_LOG}'"
@@ -58,7 +58,7 @@ if ! test -d /root/.docker
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
-            docker logs ${CONT_NAME} &> ../result/${RUN_LOG}
+            docker logs ${CONT_NAME} &> ${PATH_TEST}/${RUN_LOG}
 
             echo "*** Cleanup: ${CONT_NAME}"
             docker stop ${CONT_NAME}
@@ -66,13 +66,13 @@ if ! test -d /root/.docker
             continue
           fi
 
-          docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ../result/$TEST_LOG
+          docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ${PATH_TEST}/${TEST_LOG}
           if [[ $? -ne 0 ]]; then
             echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
           fi
 
           echo "*** Grepping for any potential tests errors from ${TEST_LOG}"
-          grep -i err  ../result/${TEST_LOG}
+          grep -i err  ${PATH_TEST}/${TEST_LOG}
 
           echo "*** Cleanup: ${CONT_NAME}"
           docker stop ${CONT_NAME}
@@ -85,8 +85,6 @@ if ! test -d /root/.docker
 
       #popd (tmp)
       popd
-
-      cp -r /workspace/docker_ce_build_ppc64/result/*  ${DIR_TEST}
 
     fi
   fi
