@@ -34,3 +34,5 @@ fi
 # get the packages list in the env_distrib.list
 echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> env-distrib.list
 echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env-distrib.list
+
+rm -rf docker-ce-packaging
