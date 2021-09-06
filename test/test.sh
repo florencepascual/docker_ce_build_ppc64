@@ -24,11 +24,6 @@ if ! test -d /root/.docker
   # docker login
     if [ ! -z "${pid}" ]
     then
-      if [[ ! -d "/workspace/docker_ce_build_ppc64/result" ]] ; then mkdir result; fi
-      if [[ ! -d "/workspace/docker_ce_build_ppc64/tmp" ]] ; then mkdir tmp; fi
-
-      pushd tmp
-
       for PACKTYPE in RPMS DEBS
       do
         echo "* Looking for distro type: ${PACKTYPE}"
@@ -38,23 +33,23 @@ if ! test -d /root/.docker
 
           echo "** Looking for ${DISTRO}"
           DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
-          DISTRO_VER="$(cut -d'-' -f2 <<<"${DISTRO}")"
-          IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VER}"
-          CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VER}"
-          BUILD_LOG="build_${DISTRO_NAME}_${DISTRO_VER}.log"
-          DOCKER_LOG="docker_${DISTRO_NAME}_${DISTRO_VER}.log"
-          TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VER}.log"
+          DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
+          IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"
+          CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VERS}"
+          BUILD_LOG="build_${DISTRO_NAME}_${DISTRO_VERS}.log"
+          DOCKER_LOG="docker_${DISTRO_NAME}_${DISTRO_VERS}.log"
+          TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VERS}.log"
 
           echo "*** Building the test image: ${IMAGE_NAME}"
-          docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VER=${DISTRO_VER}  . &> ${PATH_TEST}/${BUILD_LOG}
+          docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${PATH_TEST}/${BUILD_LOG}
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker build failed for ${DISTRO}, see details below from '${BUILD_LOG}'"
             continue
           fi
 
-          echo "*** Runing the tests from the container: ${CONT_NAME}"
-          docker run -dt --env SECRET_AUTH -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/dockertest:/workspace/dockertest --privileged --name ${CONT_NAME} ${IMAGE_NAME}
+          echo "*** Running the tests from the container: ${CONT_NAME}"
+          docker run -dt --env SECRET_AUTH -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/dockertest:/workspace/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} ${IMAGE_NAME}
 
           if [[ $? -ne 0 ]]; then
             echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
@@ -67,7 +62,8 @@ if ! test -d /root/.docker
           fi
 
           docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ${PATH_TEST}/${TEST_LOG}
-          if [[ $? -ne 0 ]]; then
+          status_code="$(docker container wait $CONT_NAME)"
+          if [[ status_code -ne 0 ]]; then
             echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
           fi
 
@@ -82,10 +78,6 @@ if ! test -d /root/.docker
 
         rm Dockerfile
       done
-
-      #popd (tmp)
-      popd
-
     fi
   fi
 fi

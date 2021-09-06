@@ -11,7 +11,7 @@ PATH_IMAGE_BUILD="quay.io/florencepascual"
 PATH_SCRIPT_TEST="/test"
 
 git clone ${PATH_GITHUB}
-chmod +x ${DIR_GITHUB}/*.sh
+chmod a+x ${DIR_GITHUB}/*.sh
 
 # docker daemon to be enabled in the pod not for testing
 # bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
@@ -28,7 +28,7 @@ echo "${SECRET_AUTH}" > /root/.docker/config.json
 CONT_NAME=docker_s3_env
 docker run --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
 status_code="$(docker container wait $CONT_NAME)"
-if [[ status_code != '0' ]]
+if [[ status_code -ne 0 ]]
 then
     # stop /
 fi
@@ -77,7 +77,11 @@ then
     docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
     # docker exec -dt docker-build nohup bash -x "/workspace/${DIR_GITHUB}/build.sh"
     # https://nickjanetakis.com/blog/docker-tip-80-waiting-for-detached-containers-to-finish and stop the containers
-    
+    status_code="$(docker container wait $CONT_NAME)"
+    if [[ status_code -ne 0 ]]
+    then
+        # stop /
+    fi
     # container to test the packages
     CONT_NAME=docker-test
     docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} ${PATH_IMAGE_BUILD}/docker_ce_build

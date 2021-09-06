@@ -2,14 +2,13 @@
 
 ARG GOLANG_VERSION=1.15.2
 
-FROM ppc64le/$DISTRO_NAME:$DISTRO_VER
+FROM ppc64le/$DISTRO_NAME:$DISTRO_VERS
 
 ARG GOLANG_VERSION
 ARG DISTRO_NAME
-ARG DISTRO_VER
-
-RUN echo $DISTRO_NAME
-RUN echo $DISTRO_VER
+ARG DISTRO_VERS
+ARG DOCKER_VERS
+ARG CONTAINERD_VERS
 
 WORKDIR /workspace
 RUN mkdir -p /workspace
@@ -19,9 +18,9 @@ ENV PATH /usr/local/go/bin:$PATH
 
 RUN set -eux; yum -y install wget make gcc findutils procps-ng
 RUN set -eux; \
-    cp /workspace/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz &&\
+    cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz &&\
     tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 6 '*/RPMS/*' &&\
-    cp /workspace/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64le/ &&\
+    cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64le/ &&\
     yum -y localinstall *.rpm
 
 ##
@@ -53,9 +52,6 @@ RUN set -eux; \
     tar -C /usr/local -xzf go.tgz; \
     rm go.tgz; \
     go version;
-
-COPY launch_test.sh /
-RUN chmod a+x /launch_test.sh
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
