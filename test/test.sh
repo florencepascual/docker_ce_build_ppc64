@@ -1,9 +1,10 @@
-#/bin/bash
+#!/bin/bash
 
-stop_docker_daemon() {
-  ps -e | grep $1 # dockerd $DAEMON
-  kill -9 $2 # pid $pid
-}
+sh ./docker_ce_build_ppc64/dockerd-entrypoint.sh &
+source ./docker_ce_build_ppc64/dockerd-starting.sh
+echo $DAEMON
+echo $pid
+
 
 set -o allexport
 source env.list
@@ -11,23 +12,20 @@ source env-distrib.list
 
 PATH_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/test"
-
-if ! test -d ${PATH_TEST}
+if [ ! -z "${pid}" ]
 then
-  mkdir ${DIR_TEST}
-fi
-
-. ./docker_ce_build_ppc64/dockerd-starting.sh
-if ! test -d /root/.docker 
+  if ! test -d ${PATH_TEST}
   then
-    mkdir /root/.docker
-    echo "${SECRET_AUTH}" > /root/.docker/config.json
+    mkdir ${DIR_TEST}
   fi
-  if grep -Fq "index.docker.io" /root/.docker/config.json
-  then
-  # docker login
-    if [ ! -z "${pid}" ]
+  if ! test -d /root/.docker 
     then
+      mkdir /root/.docker
+      echo "${SECRET_AUTH}" > /root/.docker/config.json
+    fi
+    if grep -Fq "index.docker.io" /root/.docker/config.json
+    then
+    # docker login
       for PACKTYPE in RPMS DEBS
       do
         echo "* Looking for distro type: ${PACKTYPE}"

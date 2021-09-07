@@ -11,6 +11,7 @@ PATH_IMAGE_BUILD="quay.io/florencepascual"
 PATH_SCRIPT_TEST="/test"
 
 git clone ${PATH_GITHUB}
+wget -O ${DIR_GITHUB}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
 chmod a+x ${DIR_GITHUB}/*.sh
 
 # docker daemon to be enabled in the pod not for testing
