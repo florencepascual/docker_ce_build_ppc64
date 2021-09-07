@@ -27,8 +27,7 @@ then
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
   # docker login
-    DISTROS=$(eval "echo $RPMS $DEBS")
-    for PACKTYPE in PACKTYPES
+    for PACKTYPE in RPMS DEBS
     do
       echo "* Looking for distro type: ${PACKTYPE}"
       cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile .
