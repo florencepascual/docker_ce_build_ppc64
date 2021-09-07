@@ -26,7 +26,7 @@ echo "${SECRET_AUTH}" > /root/.docker/config.json
 
 # get the env file and the dockertest repo and the latest built of containerd if we don't want to build containerd
 CONT_NAME=docker_s3_env
-docker run --env SECRET_S3 -it -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
+docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
 status_code="$(docker container wait $CONT_NAME)"
 if [[ status_code -ne 0 ]]
 then
