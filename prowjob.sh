@@ -73,10 +73,11 @@ then
     CONT_NAME=docker-build
     docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
 
-    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH -d -v /workspace:/workspace --privileged --name $CONT_NAME ${PATH_IMAGE_BUILD}/docker_ce_build
-    docker exec -dt docker-build bash -c "/workspace/${DIR_GITHUB}/build.sh"
     # docker exec -dt docker-build nohup bash -x "/workspace/${DIR_GITHUB}/build.sh"
     # https://nickjanetakis.com/blog/docker-tip-80-waiting-for-detached-containers-to-finish and stop the containers
+
+    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/build.sh ${PATH_IMAGE_BUILD}/docker_ce_build
+
     status_code="$(docker container wait $CONT_NAME)"
     if [[ status_code -ne 0 ]]
     then
