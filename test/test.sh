@@ -17,7 +17,7 @@ if [ ! -z "${pid}" ]
 then
   if ! test -d ${PATH_TEST}
   then
-    mkdir ${DIR_TEST}
+    mkdir -p "${PATH_TEST}"
   fi
   if ! test -d /root/.docker 
   then
