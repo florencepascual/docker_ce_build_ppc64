@@ -8,11 +8,12 @@ PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
 # path to the image for building and testing
 PATH_IMAGE_BUILD="quay.io/florencepascual"
 # path to test.sh, script to test docker-ce and containerd.
-PATH_SCRIPT_TEST="/test"
+PATH_SCRIPT_TEST="test"
 
 git clone ${PATH_GITHUB}
 wget -O ${DIR_GITHUB}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
 chmod a+x ${DIR_GITHUB}/*.sh
+chmod a+x ${DIR_GITHUB}/${PATH_SCRIPT_TEST}/*.sh
 
 # docker daemon to be enabled in the pod not for testing
 # bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
@@ -99,7 +100,10 @@ then
 
     # container to test the packages
     CONT_NAME=docker-test
-    docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker run --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
+
+
+    docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
     docker exec -dt ${CONT_NAME} bash -c "/workspace/${DIR_GITHUB}/test/test_distrib.sh"
 
     docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build .${PATH_SCRIPT_TEST}/test.sh
