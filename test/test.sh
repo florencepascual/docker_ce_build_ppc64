@@ -10,16 +10,14 @@ set -o allexport
 source env.list
 source env-distrib.list
 
-PATH_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
+DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/test"
 
 if [ ! -z "$pid" ]
 then
-  if ! test -d ${PATH_TEST}
+  if ! test -d ${DIR_TEST}
   then
-    mkdir -p "${PATH_TEST}"
-    ls /workspace
-    ls /workspace/docker_ce_build_ppc64
+    mkdir -p "${DIR_TEST}"
   fi
   if ! test -d /root/.docker 
   then
@@ -29,13 +27,13 @@ then
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
   # docker login
-    echo 'XXX'
-    for PACKTYPE in RPMS DEBS
+    DISTROS=$(eval "echo $RPMS $DEBS")
+    for PACKTYPE in PACKTYPES
     do
       echo "* Looking for distro type: ${PACKTYPE}"
       cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile .
-
-      for DISTRO in ${PACKTYPE} 
+      
+      for DISTRO in ${DISTROS} 
       do
         echo "** Looking for ${DISTRO}"
         DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
@@ -47,7 +45,7 @@ then
         TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VERS}.log"
 
         echo "*** Building the test image: ${IMAGE_NAME}"
-        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${PATH_TEST}/${BUILD_LOG}
+        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker build failed for ${DISTRO}, see details below from '${BUILD_LOG}'"
@@ -59,7 +57,7 @@ then
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
-          docker logs ${CONT_NAME} &> ${PATH_TEST}/${RUN_LOG}
+          docker logs ${CONT_NAME} &> ${DIR_TEST}/${RUN_LOG}
 
           echo "*** Cleanup: ${CONT_NAME}"
           docker stop ${CONT_NAME}
@@ -67,14 +65,14 @@ then
           continue
         fi
 
-        docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ${PATH_TEST}/${TEST_LOG}
+        docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ${DIR_TEST}/${TEST_LOG}
         status_code="$(docker container wait $CONT_NAME)"
         if [[ status_code -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         fi
 
         echo "*** Grepping for any potential tests errors from ${TEST_LOG}"
-        grep -i err  ${PATH_TEST}/${TEST_LOG}
+        grep -i err  ${DIR_TEST}/${TEST_LOG}
 
         echo "*** Cleanup: ${CONT_NAME}"
         docker stop ${CONT_NAME}
