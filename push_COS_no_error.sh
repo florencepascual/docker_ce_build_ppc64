@@ -90,13 +90,15 @@ echo "${DIR_DOCKER_PRIVATE} copied"
 if [[ ${CONTAINERD_VERS} != "0" ]]
 # if CONTAINERD_VERS contains a version of containerd
 then
-    # remove last version of containerd
+    # remove last version of containerd and last tests
     # rm -rf ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/containerd-*
+    # rm -rf ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/test-*
 
-    # copy the builds in the COS bucket ppc64le-docker
+    # copy the builds in the COS bucket ppc64le-docker and the tests
     DIR_CONTAINERD_PRIVATE=containerd-${CONTAINERD_VERS}
     # copy the package to the cos bucket
     # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_CONTAINERD_PRIVATE}
+    # cp -r /workspace/test-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
     echo "${DIR_CONTAINERD_PRIVATE} copied"
 fi
 

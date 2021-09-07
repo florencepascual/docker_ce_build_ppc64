@@ -82,6 +82,19 @@ then
     then
         # stop /
     fi
+
+    # change CONTAINERD_VERS to the version of the last version built
+    if [[ ${CONTAINERD_VERS} -eq 0 ]]
+    then
+        ls -d /workspace/containerd-*
+        if [[ $? -ne 0 ]]
+        then
+            echo "There is no containerd package."
+            exit 1
+        fi
+        CONTAINERD_VERS=$(eval "ls -d /workspace/containerd-* | cut -d'-' -f2")
+    fi
+
     # container to test the packages
     CONT_NAME=docker-test
     docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} ${PATH_IMAGE_BUILD}/docker_ce_build
