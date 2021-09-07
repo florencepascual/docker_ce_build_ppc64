@@ -18,6 +18,8 @@ then
   if ! test -d ${PATH_TEST}
   then
     mkdir -p "${PATH_TEST}"
+    ls /workspace
+    ls /workspace/docker_ce_build_ppc64
   fi
   if ! test -d /root/.docker 
   then
@@ -27,6 +29,7 @@ then
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
   # docker login
+    echo 'XXX'
     for PACKTYPE in RPMS DEBS
     do
       echo "* Looking for distro type: ${PACKTYPE}"
