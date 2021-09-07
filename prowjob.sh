@@ -100,7 +100,7 @@ then
 
     # container to test the packages
     CONT_NAME=docker-test
-    docker run --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker run --env SECRET_AUTH --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
 
 
     docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
