@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bash ./dockerd-entrypoint.sh &
+sh ./docker_ce_build_ppc64/dockerd-entrypoint.sh &
 
 source ./docker_ce_build_ppc64/dockerd-starting.sh
 echo $DAEMON
