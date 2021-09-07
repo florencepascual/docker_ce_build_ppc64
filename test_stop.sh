@@ -16,6 +16,5 @@ fi
 if grep -Fq "index.docker.io" /root/.docker/config.json
 then
     docker run hello-world
-    exit 0
-    stop_docker_daemon $DAEMON $pid
+    exit 0 && stop_docker_daemon $DAEMON $pid
 fi
