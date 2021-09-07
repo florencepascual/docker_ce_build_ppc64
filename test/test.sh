@@ -1,5 +1,10 @@
 #/bin/bash
 
+stop_docker_daemon() {
+  ps -e | grep $1 # dockerd $DAEMON
+  kill -9 $2 # pid $pid
+}
+
 set -o allexport
 source env.list
 source env-distrib.list
