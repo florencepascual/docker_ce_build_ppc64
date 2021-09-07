@@ -32,7 +32,7 @@ then
       echo "* Looking for distro type: ${PACKTYPE}"
       cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile .
       
-      for DISTRO in ${PACKTYPE} 
+      for DISTRO in ${!PACKTYPE} 
       do
         echo "** Looking for ${DISTRO}"
         DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
