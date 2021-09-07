@@ -1,9 +1,10 @@
 #!/bin/bash
 
-stop_docker_daemon() {
-  ps -e | grep $1 # dockerd $DAEMON
-  kill -9 $2 # pid $pid
-}
+sh ./docker_ce_build_ppc64/dockerd-entrypoint.sh &
+
+source ./docker_ce_build_ppc64/dockerd-starting.sh
+echo $DAEMON
+echo $pid
 
 set -o allexport
 source env.list
@@ -14,18 +15,16 @@ if [[ ${CONTAINERD_VERS} != "0" ]]
 then
   DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
 fi
-
-. ./docker_ce_build_ppc64/dockerd-starting.sh
-if ! test -d /root/.docker 
-then
-  mkdir /root/.docker
-  echo "$SECRET_AUTH" > /root/.docker/config.json
-fi
-if grep -Fq "index.docker.io" /root/.docker/config.json
-then
-# docker login
-  if [ ! -z "$pid" ]
+if [ ! -z "$pid" ]
   then
+    if ! test -d /root/.docker 
+    then
+      mkdir /root/.docker
+      echo "$SECRET_AUTH" > /root/.docker/config.json
+    fi
+    if grep -Fq "index.docker.io" /root/.docker/config.json
+    then
+    # docker login
     echo ""
     echo "================================================="
     echo "==   Building docker-ce                         =="
@@ -145,20 +144,17 @@ then
       # if there is no packages built for docker and no packages built for containerd
       then
         echo "No packages built for docker and for containerd"
-        exit 1
-        stop_docker_daemon $DAEMON $pid
+        kill -9 $pid && exit 1
       elif [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
       # if there is no packages built for docker or no packages built for containerd
       then 
         echo "No packages built for either docker, or containerd"
-        exit 1
-        stop_docker_daemon $DAEMON $pid
+        kill -9 $pid && exit 1
       elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
       # if there are packages built for docker and packages built for containerd
       then
         echo "All packages built"
-        exit 0
-        stop_docker_daemon $DAEMON $pid
+        kill -9 $pid && exit 0
       fi
     else
       # if CONTAINERD_VERS="0"
@@ -166,12 +162,10 @@ then
       # if there is no packages built for docker and we did not build any containerd package
       then
         "No packages built for docker"
-        exit 1
-        stop_docker_daemon $DAEMON $pid
+        kill -9 $pid && exit 1
       else
         "Packages built for docker"
-        exit 0
-        stop_docker_daemon $DAEMON $pid
+        kill -9 $pid && exit 0
       fi
     fi
   fi
