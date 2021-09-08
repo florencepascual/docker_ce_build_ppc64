@@ -45,9 +45,7 @@ RUN if [ -f /bin/rpm  ] ; \
     fi
 
 RUN set -eux; \
-        cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/ &&\
         tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
-        cp /workspace/containerd-${CONTAINERD_VERS}}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64el/* /workspace/ &&\
         dpkg -i *.deb
 
 ##
