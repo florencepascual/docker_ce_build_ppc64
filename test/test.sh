@@ -43,6 +43,15 @@ then
         DOCKER_LOG="docker_${DISTRO_NAME}_${DISTRO_VERS}.log"
         TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VERS}.log"
 
+        # get in the tmp directory with the docker-ce and containerd packages and the Dockerfile
+        mkdir tmp
+        pushd tmp
+        cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
+        # cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
+        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
+        # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64el/* /workspace/tmp
+        cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile /workspace/tmp
+
         echo "*** Building the test image: ${IMAGE_NAME}"
         docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${DIR_TEST}/${BUILD_LOG}
 

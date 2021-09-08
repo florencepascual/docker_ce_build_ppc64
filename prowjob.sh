@@ -102,11 +102,6 @@ then
     CONT_NAME=docker-test
     docker run --env SECRET_AUTH --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
 
-
-    docker run -d -v /workspace:/workspace --privileged --name ${CONT_NAME} --entrypoint ./docker_ce_build_ppc64/test/test.sh ${PATH_IMAGE_BUILD}/docker_ce_build
-    docker exec -dt ${CONT_NAME} bash -c "/workspace/${DIR_GITHUB}/test/test_distrib.sh"
-
-    docker run -d -v /home/aurelien/docker-ce:/docker-ce -v  /home/aurelien/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build .${PATH_SCRIPT_TEST}/test.sh
     # check tests
 
     # push to cos bucket ibm-docker-builds and change ppc64le-docker if no error
