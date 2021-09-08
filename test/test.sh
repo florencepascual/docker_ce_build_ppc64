@@ -47,9 +47,8 @@ then
         mkdir tmp
         pushd tmp
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
-        # cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
-        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
-        # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64el/* /workspace/tmp
+        # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
+        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64el/* /workspace/tmp
         cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile /workspace/tmp
 
         echo "*** Building the test image: ${IMAGE_NAME}"
