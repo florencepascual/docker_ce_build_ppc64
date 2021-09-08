@@ -13,8 +13,6 @@ ARG DISTRO_VERS
 ARG DOCKER_VERS
 ARG CONTAINERD_VERS
 
-RUN ls
-
 WORKDIR /workspace
 RUN mkdir -p /workspace
 ENV WORKSPACE=/workspace \
@@ -45,6 +43,9 @@ RUN if [ -f /bin/rpm  ] ; \
         iptables libdevmapper1.02.1 && \
         rm -rf /var/lib/apt/lists/* ;\
     fi
+
+COPY bundles-*.tar.gz /workspace
+COPY *.deb /workspace
 
 RUN set -eux; \
         tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
