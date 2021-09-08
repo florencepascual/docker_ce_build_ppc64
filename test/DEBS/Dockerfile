@@ -13,6 +13,8 @@ ARG DISTRO_VERS
 ARG DOCKER_VERS
 ARG CONTAINERD_VERS
 
+RUN ls
+
 WORKDIR /workspace
 RUN mkdir -p /workspace
 ENV WORKSPACE=/workspace \
