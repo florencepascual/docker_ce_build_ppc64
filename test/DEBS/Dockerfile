@@ -44,7 +44,7 @@ RUN if [ -f /bin/rpm  ] ; \
         rm -rf /var/lib/apt/lists/* ;\
     fi
 
-COPY bundles-*.tar.gz /workspace
+COPY bundles-*.tar.gz /workspace/
 COPY *.deb /workspace/
 
 RUN set -eux; \
