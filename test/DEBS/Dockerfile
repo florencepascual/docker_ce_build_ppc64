@@ -29,7 +29,6 @@ RUN echo deb;\
     wget \
     software-properties-common \
     lsb-release\
-    git\
     ##### Install go tests deps
     make\
     gcc\
@@ -76,8 +75,6 @@ RUN set -eux; \
     tar -C /usr/local -xzf go.tgz; \
     rm go.tgz; \
     go version;
-
-RUN go get github.com/stretchr/testify
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
