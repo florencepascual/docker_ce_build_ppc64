@@ -44,7 +44,7 @@ if [[ -f env.list && -f env-distrib.list ]]
 then
     set -o allexport
     source env.list
-    source env_distrib.list
+    source env-distrib.list
 else
     echo "There is no env.list and/or env-distrib.list"
     exit 1
