@@ -27,10 +27,9 @@ then
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
   # docker login
-    for PACKTYPE in RPMS DEBS
+    for PACKTYPE in DEBS RPMS
     do
       echo "* Looking for distro type: ${PACKTYPE}"
-      cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile .
       
       for DISTRO in ${!PACKTYPE} 
       do
@@ -48,7 +47,7 @@ then
         pushd tmp
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
         # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
-        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64el/* /workspace/tmp
+        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/* /workspace/tmp
         cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile /workspace/tmp
 
         echo "*** Building the test image: ${IMAGE_NAME}"
