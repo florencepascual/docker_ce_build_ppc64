@@ -82,7 +82,7 @@ RUN set -eux; \
     rm go.tgz; \
     go version;
 
-RUN go get https://github.com/stretchr/testify
+RUN go get github.com/stretchr/testify
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
