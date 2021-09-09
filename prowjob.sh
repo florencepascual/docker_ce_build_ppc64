@@ -13,7 +13,6 @@ PATH_SCRIPT_TEST="test"
 git clone ${PATH_GITHUB}
 wget -O ${DIR_GITHUB}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
 chmod a+x ${DIR_GITHUB}/*.sh
-chmod a+x ${DIR_GITHUB}/${PATH_SCRIPT_TEST}/*.sh
 
 # docker daemon to be enabled in the pod not for testing
 # bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
@@ -28,7 +27,7 @@ echo "${SECRET_AUTH}" > /root/.docker/config.json
 
 # get the env file and the dockertest repo and the latest built of containerd if we don't want to build containerd
 CONT_NAME=docker_s3_env
-docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_COS.sh"
+docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_env.sh"
 status_code="$(docker container wait $CONT_NAME)"
 if [[ status_code -ne 0 ]]
 then
@@ -39,38 +38,21 @@ fi
 #echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list
 # check COS Bucket to see if DOCKER_VERS and CONTAINERD_VERS are new versions
 
-cat env.list
-
 # check the env.list (versions of docker-ce, containerd and list of packages)
-if [[ -f env.list ]]
-# if there is env.list
+if [[ -f env.list && -f env-distrib.list ]]
+# if there is env.list and env-distrib.list
 then
-    source ./${DIR_GITHUB}/check_env.sh env.list
-    cat env.list
     set -o allexport
     source env.list
+    source env_distrib.list
 else
-    echo "There is no env.list"
+    echo "There is no env.list and/or env-distrib.list"
     exit 1
 fi
-
 
 # while the docker daemon is running
 if [ ! -z "$pid" ]
 then
-    # get the list of distros
-    source ./${DIR_GITHUB}/get_distrib.sh
-    if [[ -f env-distrib.list ]]
-    then
-        source ./${DIR_GITHUB}/check_env.sh env-distrib.list
-        cat env-distrib.list
-        set -o allexport
-        source env-distrib.list
-    else
-        echo "There is no env-distrib.list"
-        exit 1
-    fi
-
     # container to build docker-ce and containerd
     CONT_NAME=docker-build
     docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
