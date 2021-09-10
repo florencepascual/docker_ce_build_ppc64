@@ -1,8 +1,8 @@
 #!/bin/bash
 
-sh ./docker_ce_build_ppc64/dockerd-entrypoint.sh &
+sh ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-entrypoint.sh &
 
-source ./docker_ce_build_ppc64/dockerd-starting.sh
+source ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-starting.sh
 echo $DAEMON
 echo $pid
 

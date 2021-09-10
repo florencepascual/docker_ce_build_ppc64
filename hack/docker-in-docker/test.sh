@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sh ./docker_ce_build_ppc64/dockerd-entrypoint.sh &
-source ./docker_ce_build_ppc64/dockerd-starting.sh
+sh ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-entrypoint.sh &
+source ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-starting.sh
 echo $DAEMON
 echo $pid
 
@@ -11,7 +11,7 @@ source env.list
 source env-distrib.list
 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
-PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/test"
+PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 
 if [ ! -z "$pid" ]
 then
@@ -48,7 +48,7 @@ then
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
         # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
         cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/* /workspace/tmp
-        cp ${PATH_DOCKERFILE}/${PACKTYPE}/Dockerfile /workspace/tmp
+        cp ${PATH_DOCKERFILE}_${PACKTYPE}/Dockerfile /workspace/tmp
         ls /workspace/tmp
         # check we have docker-ce packages and containerd packages or Dockerfile
 
@@ -61,7 +61,7 @@ then
         fi
 
         echo "*** Running the tests from the container: ${CONT_NAME}"
-        docker run -dt --env SECRET_AUTH -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} ${IMAGE_NAME}
+        docker run -dt --env SECRET_AUTH -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/test/src/github.ibm.com/powercloud/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} ${IMAGE_NAME}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
@@ -73,7 +73,7 @@ then
           continue
         fi
 
-        docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/test_launch.sh ${DISTRO_NAME}  &> ${DIR_TEST}/${TEST_LOG}
+        docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/hack/docker-in-docker/test_launch.sh ${DISTRO_NAME}  &> ${DIR_TEST}/${TEST_LOG}
         status_code="$(docker container wait $CONT_NAME)"
         if [[ status_code -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"

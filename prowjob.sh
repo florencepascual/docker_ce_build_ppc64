@@ -10,7 +10,8 @@ PATH_IMAGE_BUILD="quay.io/florencepascual"
 
 PATH_SCRIPTS="hack/docker-in-docker"
 # path to test.sh, script to test docker-ce and containerd.
-PATH_SCRIPT_TEST="test"
+PATH_IMAGES="images/docker-in-docker"
+
 
 git clone ${PATH_GITHUB}
 wget -O ${DIR_GITHUB}/${PATH_SCRIPTS}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
@@ -32,8 +33,8 @@ CONT_NAME=docker_s3_env
 docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/${PATH_SCRIPTS}/get_env.sh"
 status_code="$(docker container wait $CONT_NAME)"
 
-
-
+set -o allexport
+source env.list
 if [[ status_code -ne 0 ]]
 then
     # stop /
@@ -50,8 +51,8 @@ make REF=${DOCKER_VERS} checkout
 popd
 
 # get the packages list in the env_distrib.list
-echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> ${FILE_ENV_DISTRIB}
-echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> ${FILE_ENV_DISTRIB}
+echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" > env-distrib.list
+echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> env-distrib.list
 
 rm -rf docker-ce-packaging
 # if we monitor github repo and put the versions into an env.list
@@ -76,12 +77,12 @@ if [ ! -z "$pid" ]
 then
     # container to build docker-ce and containerd
     CONT_NAME=docker-build
-    docker pull ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker pull ${PATH_IMAGE_BUILD}/docker_ce_build # à changer !!!!
 
     # docker exec -dt docker-build nohup bash -x "/workspace/${DIR_GITHUB}/build.sh"
     # https://nickjanetakis.com/blog/docker-tip-80-waiting-for-detached-containers-to-finish and stop the containers
 
-    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./docker_ce_build_ppc64/build.sh ${PATH_IMAGE_BUILD}/docker_ce_build
+    docker run --env DOCKER_VERS --env CONTAINERD_VERS --env PACKAGING_REF --env DEBS --env RPMS --env SECRET_AUTH --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ./{DIR_GITHUB}/${PATH_SCRIPTS}/build.sh ${PATH_IMAGE_BUILD}/docker_ce_build
 
     status_code="$(docker container wait $CONT_NAME)"
     if [[ status_code -ne 0 ]]
