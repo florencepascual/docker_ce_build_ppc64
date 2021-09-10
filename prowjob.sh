@@ -7,17 +7,19 @@ DIR_GITHUB="docker_ce_build_ppc64"
 PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
 # path to the image for building and testing
 PATH_IMAGE_BUILD="quay.io/florencepascual"
+
+PATH_SCRIPTS="hack/docker-in-docker"
 # path to test.sh, script to test docker-ce and containerd.
 PATH_SCRIPT_TEST="test"
 
 git clone ${PATH_GITHUB}
-wget -O ${DIR_GITHUB}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
-chmod a+x ${DIR_GITHUB}/*.sh
+wget -O ${DIR_GITHUB}/${PATH_SCRIPTS}/dockerd-entrypoint.sh https://raw.githubusercontent.com/docker-library/docker/master/dockerd-entrypoint.sh
+chmod a+x ${DIR_GITHUB}/${PATH_SCRIPTS}/*.sh
 
 # docker daemon to be enabled in the pod not for testing
 # bash ${PATH_DOCKERD_ENTRYPOINT}/dockerd-entrypoint.sh &
 # wait for the dockerd to start
-source ./${DIR_GITHUB}/dockerd-starting.sh
+source ./${DIR_GITHUB}/${PATH_SCRIPTS}/dockerd-starting.sh
 
 mkdir /root/.docker
 echo "${SECRET_AUTH}" > /root/.docker/config.json
@@ -27,12 +29,31 @@ echo "${SECRET_AUTH}" > /root/.docker/config.json
 
 # get the env file and the dockertest repo and the latest built of containerd if we don't want to build containerd
 CONT_NAME=docker_s3_env
-docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/get_env.sh"
+docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/${PATH_SCRIPTS}/get_env.sh"
 status_code="$(docker container wait $CONT_NAME)"
+
+
+
 if [[ status_code -ne 0 ]]
 then
     # stop /
 fi
+# generate the env-distrib.list
+mkdir docker-ce-packaging
+pushd docker-ce-packaging
+git init
+git remote add origin  https://github.com/docker/docker-ce-packaging.git
+git fetch --depth 1 origin ${PACKAGING_REF}
+git checkout FETCH_HEAD
+
+make REF=${DOCKER_VERS} checkout
+popd
+
+# get the packages list in the env_distrib.list
+echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> ${FILE_ENV_DISTRIB}
+echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> ${FILE_ENV_DISTRIB}
+
+rm -rf docker-ce-packaging
 # if we monitor github repo and put the versions into an env.list
 #echo DOCKER_VERS=\"`git ls-remote --refs --tags https://github.com/moby/moby.git | cut --delimiter='/' --fields=3 | grep 'v20' | sort --version-sort | tail --lines=1`\" > env.list
 #echo CONTAINERD_VERS=\"`git ls-remote --refs --tags https://github.com/containerd/containerd.git | cut --delimiter='/' --fields=3 | grep v1.4 | sort --version-sort | tail --lines=1`\" >> env.list

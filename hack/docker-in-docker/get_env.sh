@@ -29,53 +29,13 @@ cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/dockertest
 
 # copy the latest built of containerd if CONTAINERD_VERS = "0"
 set -o allexport
-source ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/${FILE_ENV}
+source /workspace/${FILE_ENV}
 
 if [[ ${CONTAINERD_VERS} = "0" ]]
 then
     cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/containerd-* /workspace/
 fi
 
-
-
-## generate the env-distrib.list file
-
-if [[ -d docker-ce-packaging ]]
-# if there is no docker-ce-packaging, git clone with depth 1
-then
-    rm -rf docker-ce-packaging
-fi
-mkdir docker-ce-packaging
-pushd docker-ce-packaging
-git init
-git remote add origin  https://github.com/docker/docker-ce-packaging.git
-git fetch --depth 1 origin ${PACKAGING_REF}
-git checkout FETCH_HEAD
-
-make REF=${DOCKER_VERS} checkout
-popd
-
-if [[ ! -f ${FILE_ENV_DISTRIB} ]]
-# if there is no env.list file, create the file
-then
-    touch ${FILE_ENV_DISTRIB}
-else
-# if there is already DEBS or RPMS, remove these lines
-    if grep -Fq "DEBS" ${FILE_ENV_DISTRIB}
-    then
-        sed -i '/^DEBS/d' ${FILE_ENV_DISTRIB}
-    fi
-    if grep -Fq "RPMS" ${FILE_ENV_DISTRIB}
-    then 
-        sed -i '/^RPMS/d' ${FILE_ENV_DISTRIB}
-    fi
-fi
-
-# get the packages list in the env_distrib.list
-echo DEBS=\"`cd docker-ce-packaging/deb && ls -1d debian-* ubuntu-*`\" >> ${FILE_ENV_DISTRIB}
-echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> ${FILE_ENV_DISTRIB}
-
-rm -rf docker-ce-packaging
 
 
 # ## check the env.list file
