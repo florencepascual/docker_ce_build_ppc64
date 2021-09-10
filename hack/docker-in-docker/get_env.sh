@@ -36,29 +36,7 @@ then
     cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/containerd-* /workspace/
 fi
 
-## check the env.list file
 
-grep -FLq "DOCKER_VERS" ${FILE_ENV}
-if [[ $? -eq 1 ]]
-# if there is no docker_ce version
-then
-    echo "There is no version of docker_ce"
-    exit 1
-fi
-grep -FLq "CONTAINERD_VERS" ${FILE_ENV}
-if [[ $? -eq 1 ]]
-# if there is no containerd version
-then 
-    echo "There is no version of containerd"
-    exit 1
-fi
-grep -FLq "PACKAGING_REF" ${FILE_ENV}
-if [[ $? -eq 1 ]]
-# if there is no reference of docker-ce-packaging (hash commit) 
-then
-    echo "There is no reference of docker-ce-packaging"
-    exit 1
-fi
 
 ## generate the env-distrib.list file
 
@@ -99,19 +77,44 @@ echo RPMS=\"`cd docker-ce-packaging/rpm && ls -1d centos-* fedora-*`\" >> ${FILE
 
 rm -rf docker-ce-packaging
 
-## check the env-distrib.list
 
-grep -FLq "DEBS" ${FILE_ENV_DISTRIB}
-if [[ $? -eq 1 ]]
-# if there is no DEBS
-then
-    echo "There is no distro in DEB"
-    exit 1
-fi
-grep -FLq "RPMS" ${FILE_ENV_DISTRIB}
-if [[ $? -eq 1 ]]
-# if there is no RPMS
-then 
-    echo "There is no distro in RPM"
-    exit 1
-fi
+# ## check the env.list file
+
+# grep -FLq "DOCKER_VERS" ${FILE_ENV}
+# if [[ $? -eq 1 ]]
+# # if there is no docker_ce version
+# then
+#     echo "There is no version of docker_ce"
+#     exit 1
+# fi
+# grep -FLq "CONTAINERD_VERS" ${FILE_ENV}
+# if [[ $? -eq 1 ]]
+# # if there is no containerd version
+# then 
+#     echo "There is no version of containerd"
+#     exit 1
+# fi
+# grep -FLq "PACKAGING_REF" ${FILE_ENV}
+# if [[ $? -eq 1 ]]
+# # if there is no reference of docker-ce-packaging (hash commit) 
+# then
+#     echo "There is no reference of docker-ce-packaging"
+#     exit 1
+# fi
+
+# ## check the env-distrib.list
+
+# grep -FLq "DEBS" ${FILE_ENV_DISTRIB}
+# if [[ $? -eq 1 ]]
+# # if there is no DEBS
+# then
+#     echo "There is no distro in DEB"
+#     exit 1
+# fi
+# grep -FLq "RPMS" ${FILE_ENV_DISTRIB}
+# if [[ $? -eq 1 ]]
+# # if there is no RPMS
+# then 
+#     echo "There is no distro in RPM"
+#     exit 1
+# fi
