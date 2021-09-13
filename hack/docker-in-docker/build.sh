@@ -165,10 +165,10 @@ if [ ! -z "$pid" ]
       if [[ ${BOOL_DOCKER} -eq 0 ]]
       # if there is no packages built for docker and we did not build any containerd package
       then
-        "No packages built for docker"
+        echo "No packages built for docker"
         kill -9 $pid && exit 1
       else
-        "Packages built for docker"
+        echo "Packages built for docker"
         kill -9 $pid && exit 0
       fi
     fi
