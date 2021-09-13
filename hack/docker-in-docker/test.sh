@@ -45,12 +45,15 @@ then
         # get in the tmp directory with the docker-ce and containerd packages and the Dockerfile
         mkdir tmp
         pushd tmp
+        # copy the docker_ce
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
-        # cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/amd64/* /workspace/tmp
-        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/* /workspace/tmp
-        # for PACKTYPE RPMS !!!!! only check ppc64le and ppc64el
-        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/*.ppc64le.rpm /workspace/tmp
+
+        # copy the containerd
+        cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/containerd*ppc64*.* /workspace/tmp
+
+        # copy the Dockerfile
         cp ${PATH_DOCKERFILE}_${PACKTYPE}/Dockerfile /workspace/tmp
+        
         ls /workspace/tmp
         # check we have docker-ce packages and containerd packages or Dockerfile
 
