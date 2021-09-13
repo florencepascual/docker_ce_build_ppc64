@@ -85,7 +85,7 @@ if [ ! -z "$pid" ]
 
       VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
-    # popd
+    popd
 
     echo ""
     echo "================================================="
