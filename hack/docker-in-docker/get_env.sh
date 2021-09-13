@@ -32,6 +32,11 @@ cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/test/src/gi
 set -o allexport
 source /workspace/${FILE_ENV}
 
+rm env.list
+echo DOCKER_VERS="v20.10.8" > env.list
+echo CONTAINERD_VERS="0" >> env.list
+echo PACKAGING_REF="5a28c77f52148f682ab1165dfcbbbad6537b148f" >> env.list
+
 if [[ ${CONTAINERD_VERS} = "0" ]]
 then
     cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/containerd-* /workspace/
