@@ -29,6 +29,13 @@ mkdir -p /workspace/test/src/github.ibm.com/powercloud/
 cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/test/src/github.ibm.com/powercloud/dockertest
 
 # copy the latest built of containerd if CONTAINERD_VERS = "0"
+
+
+rm /workspace/${FILE_ENV}
+echo DOCKER_VERS="v20.10.8" > /workspace/${FILE_ENV}
+echo CONTAINERD_VERS="0" >> /workspace/${FILE_ENV}
+echo PACKAGING_REF="5a28c77f52148f682ab1165dfcbbbad6537b148f" >> /workspace/${FILE_ENV}
+
 set -o allexport
 source /workspace/${FILE_ENV}
 
