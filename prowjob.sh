@@ -30,13 +30,14 @@ echo "${SECRET_AUTH}" > /root/.docker/config.json
 CONT_NAME=docker_s3_env
 docker run --env SECRET_S3 -d -v /workspace:/workspace --privileged --name $CONT_NAME debian:bullseye /bin/bash -c "/workspace/${DIR_GITHUB}/${PATH_SCRIPTS}/get_env.sh"
 status_code="$(docker container wait $CONT_NAME)"
+if [[ ${status_code} -ne 0 ]]
+then
+    exit
+fi
 
 set -o allexport
 source env.list
-if [[ status_code -ne 0 ]]
-then
-    # stop /
-fi
+
 # generate the env-distrib.list
 mkdir docker-ce-packaging
 pushd docker-ce-packaging
