@@ -70,7 +70,7 @@ if [ ! -z "$pid" ]
       echo "==   Building for:${DEB}                         =="
       echo "================================================="
 
-      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
+      #VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
     popd
 
@@ -83,7 +83,7 @@ if [ ! -z "$pid" ]
       echo "==   Building for:${RPM}                         =="
       echo "================================================="
 
-      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
+      #VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
     popd
 
@@ -92,9 +92,9 @@ if [ ! -z "$pid" ]
     echo "==   Copying packages to ${DIR_DOCKER}        =="
     echo "================================================="
 
-    cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
-    cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
-    rm -rf docker-ce-packaging
+    #cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
+    #cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
+    #rm -rf docker-ce-packaging
 
     ls ${DIR_DOCKER}/*
     if [[ $? -ne 0 ]]
@@ -161,6 +161,7 @@ if [ ! -z "$pid" ]
       fi
     else
       # if CONTAINERD_VERS="0"
+      echo $BOOL_DOCKER
       if [[ ${BOOL_DOCKER} -eq 0 ]]
       # if there is no packages built for docker and we did not build any containerd package
       then
