@@ -25,6 +25,7 @@ s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file
 cp ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/${FILE_ENV} /workspace/${FILE_ENV}
 
 # copy the dockertest repo to the local /workspace
+mkdir -p /workspace/test/src/github.ibm.com/powercloud/
 cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/test/src/github.ibm.com/powercloud/dockertest
 
 # copy the latest built of containerd if CONTAINERD_VERS = "0"
