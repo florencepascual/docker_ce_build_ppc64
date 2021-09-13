@@ -32,7 +32,7 @@ if [ ! -z "$pid" ]
     echo "==   Building docker-ce                         =="
     echo "================================================="
 
-    #mkdir ${DIR_DOCKER}
+    mkdir ${DIR_DOCKER}
 
     #Workaround for builkit cache issue where fedora-32/Dockerfile
     # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -50,19 +50,19 @@ if [ ! -z "$pid" ]
 
     DIR_PACKAGING="docker-ce-packaging"
 
-    #mkdir -p ${DIR_PACKAGING}
-    #pushd ${DIR_PACKAGING}
+    mkdir -p ${DIR_PACKAGING}
+    pushd ${DIR_PACKAGING}
 
-    # git init
-    # git remote add origin  https://github.com/docker/docker-ce-packaging.git
-    # git fetch --depth 1 origin ${PACKAGING_REF}
-    # git checkout FETCH_HEAD
+    git init
+    git remote add origin  https://github.com/docker/docker-ce-packaging.git
+    git fetch --depth 1 origin ${PACKAGING_REF}
+    git checkout FETCH_HEAD
 
-    # make REF=${DOCKER_VERS} checkout
-    # popd
+    make REF=${DOCKER_VERS} checkout
+    popd
 
-    # pushd docker-ce-packaging/deb
-    # patchDockerFiles .
+    pushd docker-ce-packaging/deb
+    patchDockerFiles .
     for DEB in ${DEBS}
     do
       echo ""
@@ -70,12 +70,12 @@ if [ ! -z "$pid" ]
       echo "==   Building for:${DEB}                         =="
       echo "================================================="
 
-      #VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
+      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
-    # popd
+    popd
 
-    # pushd docker-ce-packaging/rpm
-    # patchDockerFiles .
+    pushd docker-ce-packaging/rpm
+    patchDockerFiles .
     for RPM in ${RPMS}
     do
       echo ""
@@ -83,7 +83,7 @@ if [ ! -z "$pid" ]
       echo "==   Building for:${RPM}                         =="
       echo "================================================="
 
-      #VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
+      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
     # popd
 
@@ -92,9 +92,9 @@ if [ ! -z "$pid" ]
     echo "==   Copying packages to ${DIR_DOCKER}        =="
     echo "================================================="
 
-    #cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
-    #cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
-    #rm -rf docker-ce-packaging
+    cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
+    cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
+    rm -rf docker-ce-packaging
 
     ls ${DIR_DOCKER}/*
     if [[ $? -ne 0 ]]
