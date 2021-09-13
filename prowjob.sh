@@ -3,11 +3,9 @@
 # path to the github repository
 PATH_GITHUB="https://github.com/florencepascual/docker_ce_build_ppc64.git"
 DIR_GITHUB="docker_ce_build_ppc64"
-# path to the dockerd-entrypoint.sh
-PATH_DOCKERD_ENTRYPOINT="/usr/local/bin"
 # path to the image for building and testing
 PATH_IMAGE_BUILD="quay.io/florencepascual"
-
+# path to the scripts 
 PATH_SCRIPTS="hack/docker-in-docker"
 # path to test.sh, script to test docker-ce and containerd.
 PATH_IMAGES="images/docker-in-docker"
