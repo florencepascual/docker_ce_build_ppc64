@@ -32,7 +32,7 @@ if [ ! -z "$pid" ]
     echo "==   Building docker-ce                         =="
     echo "================================================="
 
-    mkdir ${DIR_DOCKER}
+    #mkdir ${DIR_DOCKER}
 
     #Workaround for builkit cache issue where fedora-32/Dockerfile
     # (or the 1st Dockerfile used by buildkit) is used for all fedora's version
@@ -50,7 +50,7 @@ if [ ! -z "$pid" ]
 
     DIR_PACKAGING="docker-ce-packaging"
 
-    mkdir -p ${DIR_PACKAGING}
+    #mkdir -p ${DIR_PACKAGING}
     pushd ${DIR_PACKAGING}
 
     git init
