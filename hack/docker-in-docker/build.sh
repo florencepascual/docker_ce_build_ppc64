@@ -51,18 +51,18 @@ if [ ! -z "$pid" ]
     DIR_PACKAGING="docker-ce-packaging"
 
     #mkdir -p ${DIR_PACKAGING}
-    pushd ${DIR_PACKAGING}
+    #pushd ${DIR_PACKAGING}
 
-    git init
-    git remote add origin  https://github.com/docker/docker-ce-packaging.git
-    git fetch --depth 1 origin ${PACKAGING_REF}
-    git checkout FETCH_HEAD
+    # git init
+    # git remote add origin  https://github.com/docker/docker-ce-packaging.git
+    # git fetch --depth 1 origin ${PACKAGING_REF}
+    # git checkout FETCH_HEAD
 
-    make REF=${DOCKER_VERS} checkout
-    popd
+    # make REF=${DOCKER_VERS} checkout
+    # popd
 
-    pushd docker-ce-packaging/deb
-    patchDockerFiles .
+    # pushd docker-ce-packaging/deb
+    # patchDockerFiles .
     for DEB in ${DEBS}
     do
       echo ""
@@ -72,10 +72,10 @@ if [ ! -z "$pid" ]
 
       #VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
-    popd
+    # popd
 
-    pushd docker-ce-packaging/rpm
-    patchDockerFiles .
+    # pushd docker-ce-packaging/rpm
+    # patchDockerFiles .
     for RPM in ${RPMS}
     do
       echo ""
@@ -85,7 +85,7 @@ if [ ! -z "$pid" ]
 
       #VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
-    popd
+    # popd
 
     echo ""
     echo "================================================="
