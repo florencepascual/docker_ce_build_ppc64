@@ -1,17 +1,18 @@
 #!/bin/bash
 
-sh ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-entrypoint.sh &
-source ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-starting.sh
-echo $DAEMON
-echo $pid
+set -e
 
+PATH_SCRIPTS="docker_ce_build_ppc64/hack/docker-in-docker"
+DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
+PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
+
+sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
+source ./${PATH_SCRIPTS}/dockerd-starting.sh
 
 set -o allexport
 source env.list
 source env-distrib.list
 
-DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
-PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 
 if [ ! -z "$pid" ]
 then
@@ -39,7 +40,6 @@ then
         IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"
         CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VERS}"
         BUILD_LOG="build_${DISTRO_NAME}_${DISTRO_VERS}.log"
-        DOCKER_LOG="docker_${DISTRO_NAME}_${DISTRO_VERS}.log"
         TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VERS}.log"
 
         # get in the tmp directory with the docker-ce and containerd packages and the Dockerfile
@@ -67,8 +67,6 @@ then
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
-          docker logs ${CONT_NAME} &> ${DIR_TEST}/${RUN_LOG}
-
           echo "*** Cleanup: ${CONT_NAME}"
           docker stop ${CONT_NAME}
           docker rm ${CONT_NAME}

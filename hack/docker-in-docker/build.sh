@@ -1,16 +1,18 @@
 #!/bin/bash
 
-sh ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-entrypoint.sh &
+set -e
 
-source ./docker_ce_build_ppc64/hack/docker-in-docker/dockerd-starting.sh
-echo $DAEMON
-echo $pid
+PATH_SCRIPTS="docker_ce_build_ppc64/hack/docker-in-docker"
+
+sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
+source ./${PATH_SCRIPTS}/dockerd-starting.sh
 
 set -o allexport
 source env.list
 source env-distrib.list
 
 DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
+
 if [[ ${CONTAINERD_VERS} != "0" ]]
 then
   DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
@@ -130,6 +132,7 @@ if [ ! -z "$pid" ]
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
 
+      # check if packages have been built and stop the container
       ls ${DIR_CONTAINERD}/*
       if [[ $? -ne 0 ]]
       then
