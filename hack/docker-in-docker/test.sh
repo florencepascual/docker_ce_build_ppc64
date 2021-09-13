@@ -52,8 +52,8 @@ then
         cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/containerd*ppc64*.* /workspace/tmp
 
         # copy the Dockerfile
-        cp ${PATH_DOCKERFILE}_${PACKTYPE}/Dockerfile /workspace/tmp
-        
+        cp ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile /workspace/tmp
+
         ls /workspace/tmp
         # check we have docker-ce packages and containerd packages or Dockerfile
 
