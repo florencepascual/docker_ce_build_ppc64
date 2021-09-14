@@ -21,3 +21,4 @@ make test WHAT="./tests/${DISTRO_NAME}" GOFLAGS="-v"
 
 echo "End of the docker test suite"
 
+exit 0
