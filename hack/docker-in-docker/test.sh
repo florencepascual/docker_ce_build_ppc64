@@ -11,7 +11,7 @@ DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 
 sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ./${PATH_SCRIPTS}/dockerd-starting.sh
+source /${PATH_SCRIPTS}/dockerd-starting.sh
 
 if [ ! -z "$pid" ]
 then

@@ -11,7 +11,7 @@ pwd
 ls -f /${PATH_SCRIPTS}/dockerd-starting.sh
 
 sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ./${PATH_SCRIPTS}/dockerd-starting.sh
+source /${PATH_SCRIPTS}/dockerd-starting.sh
 
 echo ${DISTRO_NAME}
 
