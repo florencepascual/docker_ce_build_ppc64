@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # launches test from the repo https://github.ibm.com/powercloud/dockertest
 
 set -ue
