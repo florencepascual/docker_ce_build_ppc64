@@ -78,10 +78,7 @@ then
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         fi
-
-        echo "*** Grepping for any potential tests errors from ${TEST_LOG}"
-        grep -i err ${DIR_TEST}/${TEST_LOG}
-
+        
         echo "*** Cleanup: ${CONT_NAME}"
         docker stop ${CONT_NAME}
         docker rm ${CONT_NAME}
