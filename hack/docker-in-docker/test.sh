@@ -8,6 +8,7 @@ source env-distrib.list
 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
+echo ${PATH_SCRIPTS}
 
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ${PATH_SCRIPTS}/dockerd-starting.sh
