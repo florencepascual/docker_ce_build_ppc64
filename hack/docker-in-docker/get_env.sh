@@ -8,7 +8,7 @@ PATH_PASSWORD="/root/.s3fs_cos_secret"
 COS_BUCKET="ppc64le-docker"
 URL_COS="https://s3.us-south.cloud-object-storage.appdomain.cloud"
 FILE_ENV="env.list"
-FILE_ENV_DISTRIB="env-distrib.list"
+PATH_DOCKERTEST="/workspace/test/src/github.ibm.com/powercloud"
 
 echo ":" > ${PATH_PASSWORD}_buffer
 echo "$SECRET_S3" >> ${PATH_PASSWORD}_buffer
@@ -25,8 +25,8 @@ s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file
 cp ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/${FILE_ENV} /workspace/${FILE_ENV}
 
 # copy the dockertest repo to the local /workspace
-mkdir -p /workspace/test/src/github.ibm.com/powercloud/
-cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest /workspace/test/src/github.ibm.com/powercloud/dockertest
+mkdir -p ${PATH_DOCKERTEST}
+cp -r ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/dockertest ${PATH_DOCKERTEST}/dockertest
 
 # copy the latest built of containerd if CONTAINERD_VERS = "0"
 
@@ -45,7 +45,7 @@ then
 fi
 
 # check we have the env.list, the dockertest and the containerd packages if CONTAINERD_VERS = 0
-if test -f /workspace/${FILE_ENV} && test -d /workspace/test/src/github.ibm.com/powercloud/dockertest
+if test -f /workspace/${FILE_ENV} && test -d ${PATH_DOCKERTEST}/dockertest
 then
     if [[ ${CONTAINERD_VERS} = "0" ]]
     then
