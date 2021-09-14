@@ -78,14 +78,14 @@ then
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         fi
-        
+
         echo "*** Cleanup: ${CONT_NAME}"
         docker stop ${CONT_NAME}
         docker rm ${CONT_NAME}
         docker image rm ${IMAGE_NAME}
+        popd
+        rm -rf tmp
       done
-
-      rm Dockerfile
     done
   fi
 fi
