@@ -6,7 +6,7 @@ set -o allexport
 source env.list
 source env-distrib.list
 
-PATH_SCRIPTS="docker_ce_build_ppc64/hack/docker-in-docker"
+PATH_SCRIPTS="workspace/docker_ce_build_ppc64/hack/docker-in-docker"
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 
@@ -72,7 +72,7 @@ then
 
 
         echo "*** Running the tests from the container: ${CONT_NAME}"
-        docker run --env SECRET_AUTH --env DISTRO_NAME --init -d -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/test/src/github.ibm.com/powercloud/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} ${IMAGE_NAME} ./${PATH_SCRIPTS}/test_launch.sh &> ${DIR_TEST}/${TEST_LOG}
+        docker run --env SECRET_AUTH --env DISTRO_NAME --init -d -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/test/src/github.ibm.com/powercloud/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} ${IMAGE_NAME} bash /${PATH_SCRIPTS}/test_launch.sh &> ${DIR_TEST}/${TEST_LOG}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
