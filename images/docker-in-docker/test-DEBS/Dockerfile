@@ -78,4 +78,5 @@ RUN set -eux; \
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
 
-CMD ["dockerd-entrypoint.sh"]
+ENTRYPOINT ["dockerd-entrypoint.sh"]
+CMD []
