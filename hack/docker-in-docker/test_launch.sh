@@ -2,8 +2,8 @@
 # launches test from the repo https://github.ibm.com/powercloud/dockertest
 
 set -ue
-
-PATH_SCRIPTS="docker_ce_build_ppc64/hack/docker-in-docker"
+echo "XXXXXX"
+PATH_SCRIPTS="/workspace/docker_ce_build_ppc64/hack/docker-in-docker"
 
 sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ./${PATH_SCRIPTS}/dockerd-starting.sh
