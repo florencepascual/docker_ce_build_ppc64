@@ -3,7 +3,7 @@
 
 set -ue
 echo "XXXXXX"
-PATH_SCRIPTS="/workspace/docker_ce_build_ppc64/hack/docker-in-docker"
+PATH_SCRIPTS="workspace/docker_ce_build_ppc64/hack/docker-in-docker"
 
 sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ./${PATH_SCRIPTS}/dockerd-starting.sh
