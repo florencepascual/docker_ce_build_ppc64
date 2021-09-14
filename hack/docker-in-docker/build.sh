@@ -2,10 +2,8 @@
 
 set -e
 
-PATH_SCRIPTS="docker_ce_build_ppc64/hack/docker-in-docker"
-
-sh ./${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ./${PATH_SCRIPTS}/dockerd-starting.sh
+sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
+source ${PATH_SCRIPTS}/dockerd-starting.sh
 
 set -o allexport
 source env.list
