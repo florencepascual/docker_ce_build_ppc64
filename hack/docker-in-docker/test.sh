@@ -70,8 +70,9 @@ then
           continue
         fi
 
+
         echo "*** Running the tests from the container: ${CONT_NAME}"
-        docker run --env SECRET_AUTH --init -d -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/test/src/github.ibm.com/powercloud/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} --entrypoint /workspace/docker_ce_build_ppc64/hack/docker-in-docker/test_launch.sh ${DISTRO_NAME} ${IMAGE_NAME} &> ${DIR_TEST}/${TEST_LOG}
+        docker run --env SECRET_AUTH --init -d -v /workspace/docker-ce-${DOCKER_VERS}:/workspace/docker-ce-${DOCKER_VERS} -v /workspace/containerd-${CONTAINERD_VERS}:/workspace/containerd-${CONTAINERD_VERS} -v /workspace/test/src/github.ibm.com/powercloud/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest -v /workspace/docker_ce_build_ppc64:/workspace/docker_ce_build_ppc64 --privileged --name ${CONT_NAME} --entrypoint /bin/bash -c "/workspace/docker_ce_build_ppc64/hack/docker-in-docker/test_launch.sh ${DISTRO_NAME}" ${IMAGE_NAME} &> ${DIR_TEST}/${TEST_LOG}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
@@ -83,7 +84,7 @@ then
 
         #docker exec ${CONT_NAME} /bin/bash /workspace/docker_ce_build_ppc64/hack/docker-in-docker/test_launch.sh ${DISTRO_NAME}  &> ${DIR_TEST}/${TEST_LOG}
         status_code="$(docker container wait $CONT_NAME)"
-        if [[ status_code -ne 0 ]]; then
+        if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         fi
 
