@@ -76,7 +76,7 @@ then
 
         docker run --env SECRET_AUTH --env DISTRO_NAME --init -d -v /workspace:/workspace --privileged --name ${CONT_NAME} ${IMAGE_NAME} bash /${PATH_SCRIPTS}/test_launch.sh
 
-        docker run --env SECRET_AUTH --env DISTRO_NAME --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME}
+        docker run --env SECRET_AUTH --env DISTRO_NAME --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint /${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker run failed for ${DISTRO}. Calling docker logs ${CONT_NAME}"
