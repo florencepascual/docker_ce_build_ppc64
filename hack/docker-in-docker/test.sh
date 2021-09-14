@@ -72,11 +72,13 @@ then
         fi
 
         echo "*** Running the tests from the container: ${CONT_NAME}"
-        docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME} &> ${DIR_TEST}/${TEST_LOG}
+        docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME}
 
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
+        else
+          docker logs $CONT_NAME > ${DIR_TEST}/${TEST_LOG}
         fi
 
         echo "*** Cleanup: ${CONT_NAME}"
