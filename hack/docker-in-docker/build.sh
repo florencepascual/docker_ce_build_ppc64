@@ -116,5 +116,45 @@ if [ ! -z "$pid" ]
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
     fi
+
+    # Check if the docker-ce packages have been built
+    ls ${DIR_DOCKER}/*
+    if [[ $? -ne 0 ]]
+    then
+      # No packages built
+      BOOL_DOCKER=0
+    else
+      # Packages built
+      BOOL_DOCKER=1
+    fi
+
+    # Check if the containerd packages have been built
+    ls ${DIR_CONTAINERD}/*
+    if [[ $? -ne 0 ]]
+    then
+      BOOL_CONTAINERD=0
+    else
+      # Packages built
+      BOOL_CONTAINERD=1
+    fi
+
+    # Check if all packages have been built
+    if [[ ${BOOL_DOCKER} -eq 0 ]] && [[ ${BOOL_CONTAINERD} -eq 0 ]]
+    # if there is no packages built for docker and no packages built for containerd
+    then
+      echo "No packages built for docker and for containerd"
+      exit 1
+    elif [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
+    # if there is no packages built for docker or no packages built for containerd
+    then 
+      echo "No packages built for either docker, or containerd"
+      exit 1
+    elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
+    # if there are packages built for docker and packages built for containerd
+    then
+      echo "All packages built"
+      exit 0
+    fi
+
   fi
 fi
