@@ -8,8 +8,6 @@ source env-distrib.list
 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
-echo ${PATH_SCRIPTS}
-echo $SECRET_AUTH
 
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ${PATH_SCRIPTS}/dockerd-starting.sh
@@ -30,11 +28,11 @@ then
   # docker login
     for PACKTYPE in DEBS RPMS
     do
-      echo "* Looking for distro type: ${PACKTYPE}"
+      echo "# Looking for distro type: ${PACKTYPE} #"
       
       for DISTRO in ${!PACKTYPE} 
       do
-        echo "** Looking for ${DISTRO}"
+        echo "## Looking for ${DISTRO} ##"
         DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
         DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
         IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"
@@ -51,37 +49,35 @@ then
           mkdir tmp
         fi
         pushd tmp
+        echo "### Copying the packages and the dockerfile for ${DISTRO} ###"
+        # !! We can change the entrypoint of the dockerfiles to the script test_launch.sh and put test_launch.sh in this directory
         # copy the docker_ce
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
-
         # copy the containerd
         cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/containerd*ppc64*.* /workspace/tmp
-
         # copy the Dockerfile
         cp ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile /workspace/tmp
+        # check we have docker-ce packages and containerd packages and Dockerfile
 
-        ls /workspace/tmp
-        # check we have docker-ce packages and containerd packages or Dockerfile
-
-        echo "*** Building the test image: ${IMAGE_NAME}"
+        echo "### # Building the test image: ${IMAGE_NAME} # ###"
         docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
-          echo "ERROR: docker build failed for ${DISTRO}, see details below from '${BUILD_LOG}'"
+          echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'"
           continue
         fi
 
-        echo "*** Running the tests from the container: ${CONT_NAME}"
+        echo "### ## Running the tests from the container: ${CONT_NAME} ## ###"
         docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME}
 
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         else
-          docker logs $CONT_NAME > ${DIR_TEST}/${TEST_LOG}
+          docker logs $CONT_NAME &> ${DIR_TEST}/${TEST_LOG}
         fi
 
-        echo "*** Cleanup: ${CONT_NAME}"
+        echo "### ### Cleanup: ${CONT_NAME} ### ###"
         docker stop ${CONT_NAME}
         docker rm ${CONT_NAME}
         docker image rm ${IMAGE_NAME}

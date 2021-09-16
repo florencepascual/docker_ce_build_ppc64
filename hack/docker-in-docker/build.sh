@@ -9,12 +9,6 @@ set -o allexport
 source env.list
 source env-distrib.list
 
-DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
-
-if [[ ${CONTAINERD_VERS} != "0" ]]
-then
-  DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
-fi
 if [ ! -z "$pid" ]
   then
     if ! test -d /root/.docker 
@@ -30,6 +24,7 @@ if [ ! -z "$pid" ]
     echo "==   Building docker-ce                         =="
     echo "================================================="
 
+    DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
     mkdir ${DIR_DOCKER}
 
     #Workaround for builkit cache issue where fedora-32/Dockerfile
@@ -94,16 +89,6 @@ if [ ! -z "$pid" ]
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
     rm -rf docker-ce-packaging
 
-    ls ${DIR_DOCKER}/*
-    if [[ $? -ne 0 ]]
-    then
-      # No packages built
-      BOOL_DOCKER=0
-    else
-      # Packages built
-      BOOL_DOCKER=1
-    fi
-
     if [[ ${CONTAINERD_VERS} != "0" ]]
     # CONTAINERD_VERS is equal to a version of containerd we want to build
     then
@@ -111,7 +96,8 @@ if [ ! -z "$pid" ]
       echo "================================================="
       echo "==   Building containerd                         =="
       echo "================================================="
-
+      
+      DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
       mkdir ${DIR_CONTAINERD}
 
       git clone https://github.com/docker/containerd-packaging.git
@@ -129,46 +115,6 @@ if [ ! -z "$pid" ]
 
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
-
-      # check if packages have been built and stop the container
-      ls ${DIR_CONTAINERD}/*
-      if [[ $? -ne 0 ]]
-      then
-        # No packages built
-        BOOL_CONTAINERD=0
-      else
-        # Packages built
-        BOOL_CONTAINERD=1
-      fi
-
-      if [[ ${BOOL_DOCKER} -eq 0 ]] && [[ ${BOOL_CONTAINERD} -eq 0 ]]
-      # if there is no packages built for docker and no packages built for containerd
-      then
-        echo "No packages built for docker and for containerd"
-        kill -9 $pid && exit 1
-      elif [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
-      # if there is no packages built for docker or no packages built for containerd
-      then 
-        echo "No packages built for either docker, or containerd"
-        kill -9 $pid && exit 1
-      elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
-      # if there are packages built for docker and packages built for containerd
-      then
-        echo "All packages built"
-        kill -9 $pid && exit 0
-      fi
-    else
-      # if CONTAINERD_VERS="0"
-      echo $BOOL_DOCKER
-      if [[ ${BOOL_DOCKER} -eq 0 ]]
-      # if there is no packages built for docker and we did not build any containerd package
-      then
-        echo "No packages built for docker"
-        kill -9 $pid && exit 1
-      else
-        echo "Packages built for docker"
-        kill -9 $pid && exit 0
-      fi
     fi
   fi
 fi
