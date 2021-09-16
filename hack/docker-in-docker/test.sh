@@ -40,6 +40,8 @@ then
         BUILD_LOG="build_${DISTRO_NAME}_${DISTRO_VERS}.log"
         TEST_LOG="test_${DISTRO_NAME}_${DISTRO_VERS}.log"
 
+        export DISTRO_NAME
+
         # get in the tmp directory with the docker-ce and containerd packages and the Dockerfile
         if ! test -d tmp
         then
@@ -57,6 +59,9 @@ then
         cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/containerd*ppc64*.* /workspace/tmp
         # copy the Dockerfile
         cp ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile /workspace/tmp
+        # copy the test_launch.sh which will be copied in /usr/local/bin
+        # copy not necessary of the dockerd-starting.sh and the dockerd-entrypoint.sh
+        cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
         # check we have docker-ce packages and containerd packages and Dockerfile
 
         echo "### # Building the test image: ${IMAGE_NAME} # ###"
@@ -68,7 +73,7 @@ then
         fi
 
         echo "### ## Running the tests from the container: ${CONT_NAME} ## ###"
-        docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS --init -d -v /workspace:/workspace --privileged --name $CONT_NAME --entrypoint ${PATH_SCRIPTS}/test_launch.sh ${IMAGE_NAME}
+        docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${IMAGE_NAME}
 
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
