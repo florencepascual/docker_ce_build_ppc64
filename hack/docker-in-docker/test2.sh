@@ -57,8 +57,10 @@ then
         cp /workspace/containerd-${CONTAINERD_VERS}/${DISTRO_NAME}/${DISTRO_VERS}/ppc64*/containerd*ppc64*.* /workspace/tmp
         # copy the Dockerfile
         cp ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile /workspace/tmp
-        # copy the test_launch.sh
+        # copy the test_launch.sh and the dockerd-starting.sh and the dockerd-entrypoint.sh
         cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
+        cp ${PATH_SCRIPTS}/dockerd-starting.sh /workspace/tmp
+        cp ${PATH_SCRIPTS}/dockerd-entrypoint.sh /workspace/tmp
 
         # check we have docker-ce packages and containerd packages and Dockerfile
 

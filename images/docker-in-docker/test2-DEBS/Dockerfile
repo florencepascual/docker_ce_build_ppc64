@@ -39,10 +39,12 @@ RUN echo deb;\
 
 COPY bundles-*.tar.gz /workspace/
 COPY *.deb /workspace/
+COPY *.sh /workspace/
 
 RUN set -eux; \
         tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
         dpkg -i *.deb
+
 
 ##
 #Docker in Docker inspired from
@@ -61,12 +63,6 @@ ENV DIND_COMMIT ed89041433a031cafc0a0f19cfe573c31688d377
 RUN set -eux; \
         wget -O /usr/local/bin/dind "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind"; \
         chmod +x /usr/local/bin/dind;
-
-#COPY dockerd-entrypoint.sh /usr/local/bin/
-RUN set -eux; \
-    wget https://raw.githubusercontent.com/docker-library/docker/094faa88f437cafef7aeb0cc36e75b59046cc4b9/20.10/dind/dockerd-entrypoint.sh;\
-    chmod +x dockerd-entrypoint.sh;\
-    mv dockerd-entrypoint.sh /usr/local/bin
 
 RUN set -eux; \
 	url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz";\
