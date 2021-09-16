@@ -22,7 +22,7 @@ RUN set -eux; yum -y install wget make gcc findutils procps-ng
 
 COPY bundles-*.tar.gz /workspace
 COPY *.rpm /workspace/
-COPY *.sh /workspace
+COPY *.sh /usr/local/bin/
 
 RUN set -eux; \
     tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 6 '*/RPMS/*' &&\

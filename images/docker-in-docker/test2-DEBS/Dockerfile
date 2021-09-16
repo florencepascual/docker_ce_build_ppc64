@@ -39,7 +39,7 @@ RUN echo deb;\
 
 COPY bundles-*.tar.gz /workspace/
 COPY *.deb /workspace/
-COPY *.sh /workspace/
+COPY *.sh /usr/local/bin/
 
 RUN set -eux; \
         tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
