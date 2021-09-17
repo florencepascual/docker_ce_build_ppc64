@@ -9,13 +9,9 @@ sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 set -o allexport
 source env.list
 source env-distrib.list
-echo "1"
-echo $pid
 
 if [ ! -z "$pid" ]
 then
-  echo $pid
-  echo "X"
   if ! test -d /root/.docker 
   then
     echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
