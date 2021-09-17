@@ -4,12 +4,13 @@ set -e
 
 echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
+. ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
 
 set -o allexport
 source env.list
 source env-distrib.list
 echo "1"
+echo $pid
 
 if [ ! -z "$pid" ]
 then
