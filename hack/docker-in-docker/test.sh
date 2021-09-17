@@ -101,22 +101,26 @@ then
         popd
         rm -rf tmp
         # check the logs
-        echo "### ### # Checking the logs # ### ###" 2>&1 | tee -a ${PATH_LOG}
-        echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
-        TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
+        if test -f ${TEST_LOG}
+        then
+          echo "### ### # Checking the logs # ### ###" 2>&1 | tee -a ${PATH_LOG}
+          echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
 
-        TEST_1=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
-        echo "TestDistro : ${TEST_1}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+          TEST_1=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
+          echo "TestDistro : ${TEST_1}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
-        TEST_2=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==3' | cut -d' ' -f 3")
-        echo "TestDistroInstallPackage : ${TEST_2}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+          TEST_2=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==3' | cut -d' ' -f 3")
+          echo "TestDistroInstallPackage : ${TEST_2}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
-        TEST_3=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==4' | cut -d' ' -f 3")
-        echo "TestDistroPackageCheck : ${TEST_3}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+          TEST_3=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==4' | cut -d' ' -f 3")
+          echo "TestDistroPackageCheck : ${TEST_3}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
-        [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
-        echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-        tail -5 ${PATH_TEST_ERRORS} 2>&1 | tee -a ${PATH_LOG}
+          [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
+          echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+          tail -5 ${PATH_TEST_ERRORS} 2>&1 | tee -a ${PATH_LOG}
+        else 
+          echo "There is no ${TEST_LOG} file." 2>&1 | tee -a ${PATH_LOG}
+        fi
       done
     done
   fi
