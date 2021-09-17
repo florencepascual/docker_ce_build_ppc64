@@ -89,6 +89,7 @@ then
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details from '${TEST_LOG}'" 2>&1 | tee -a ${PATH_LOG}
+          docker logs $CONT_NAME 2>&1 | tee ${DIR_TEST}/${TEST_LOG}
         else
           docker logs $CONT_NAME 2>&1 | tee ${DIR_TEST}/${TEST_LOG}
           echo "tests done" 2>&1 | tee -a ${PATH_LOG}
