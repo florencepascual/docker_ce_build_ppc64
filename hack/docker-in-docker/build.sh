@@ -2,8 +2,9 @@
 
 set -e
 
+echo "# Dockerd #" &>> ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ${PATH_SCRIPTS}/dockerd-starting.sh
+source ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
 
 set -o allexport
 source env.list
@@ -13,16 +14,14 @@ if [ ! -z "$pid" ]
   then
     if ! test -d /root/.docker 
     then
+      echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
       mkdir /root/.docker
       echo "$SECRET_AUTH" > /root/.docker/config.json
     fi
     if grep -Fq "index.docker.io" /root/.docker/config.json
     then
     # docker login
-    echo ""
-    echo "================================================="
-    echo "==   Building docker-ce                         =="
-    echo "================================================="
+    echo "### Building docker-ce ###" 2>&1 | tee -a ${PATH_LOG}
 
     DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
     mkdir ${DIR_DOCKER}
@@ -58,12 +57,9 @@ if [ ! -z "$pid" ]
     patchDockerFiles .
     for DEB in ${DEBS}
     do
-      echo ""
-      echo "================================================="
-      echo "==   Building for:${DEB}                         =="
-      echo "================================================="
+      echo "= Building for:${DEB} =" 2>&1 | tee -a ${PATH_LOG}
 
-      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
+      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz 2>&1 | tee -a ${PATH_LOG}
     done
     popd
 
@@ -71,19 +67,13 @@ if [ ! -z "$pid" ]
     patchDockerFiles .
     for RPM in ${RPMS}
     do
-      echo ""
-      echo "================================================="
-      echo "==   Building for:${RPM}                         =="
-      echo "================================================="
+      echo "== Building for:${RPM} ==" 2>&1 | tee -a ${PATH_LOG}
 
-      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
+      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz 2>&1 | tee -a ${PATH_LOG}
     done
     popd
 
-    echo ""
-    echo "================================================="
-    echo "==   Copying packages to ${DIR_DOCKER}        =="
-    echo "================================================="
+    echo "=== Copying packages to ${DIR_DOCKER} ===" 2>&1 | tee -a ${PATH_LOG}
 
     cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
@@ -92,10 +82,7 @@ if [ ! -z "$pid" ]
     if [[ ${CONTAINERD_VERS} != "0" ]]
     # CONTAINERD_VERS is equal to a version of containerd we want to build
     then
-      echo ""
-      echo "================================================="
-      echo "==   Building containerd                         =="
-      echo "================================================="
+      echo "= Building containerd =" 2>&1 | tee -a ${PATH_LOG}
       
       DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
       mkdir ${DIR_CONTAINERD}
@@ -108,7 +95,7 @@ if [ ! -z "$pid" ]
 
       for DISTRO in $DISTROS
       do
-        make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO}
+        make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO} 2>&1 | tee -a ${PATH_LOG}
       done
 
       popd
@@ -155,6 +142,5 @@ if [ ! -z "$pid" ]
       echo "All packages built"
       exit 0
     fi
-
   fi
 fi

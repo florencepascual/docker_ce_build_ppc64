@@ -9,8 +9,9 @@ source env-distrib.list
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 
+echo "# Dockerd #" &>> ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-source ${PATH_SCRIPTS}/dockerd-starting.sh
+source ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
 
 if [ ! -z "$pid" ]
 then
@@ -20,6 +21,7 @@ then
   fi
   if ! test -d /root/.docker 
   then
+    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
     mkdir /root/.docker
     echo "${SECRET_AUTH}" > /root/.docker/config.json
   fi
@@ -28,11 +30,11 @@ then
   # docker login
     for PACKTYPE in DEBS RPMS
     do
-      echo "# Looking for distro type: ${PACKTYPE} #"
+      echo "### Looking for distro type: ${PACKTYPE} ###" 2>&1 | tee -a ${PATH_LOG}
       
       for DISTRO in ${!PACKTYPE} 
       do
-        echo "## Looking for ${DISTRO} ##"
+        echo "### # Looking for ${DISTRO} # ###" 2>&1 | tee -a ${PATH_LOG}
         DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
         DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
         IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"
@@ -51,8 +53,7 @@ then
           mkdir tmp
         fi
         pushd tmp
-        echo "### Copying the packages and the dockerfile for ${DISTRO} ###"
-        # !! We can change the entrypoint of the dockerfiles to the script test_launch.sh and put test_launch.sh in this directory
+        echo "### ## Copying the packages and the dockerfile for ${DISTRO} ## ###" 2>&1 | tee -a ${PATH_LOG}
         # copy the docker_ce
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
         # copy the containerd
@@ -64,8 +65,8 @@ then
         cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
         # check we have docker-ce packages and containerd packages and Dockerfile
 
-        echo "### # Building the test image: ${IMAGE_NAME} # ###"
-        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . &> ${DIR_TEST}/${BUILD_LOG}
+        echo "### # Building the test image: ${IMAGE_NAME} # ###" 2>&1 | tee -a ${PATH_LOG}
+        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . 2>&1 | tee -a ${PATH_LOG} ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
           echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'"
@@ -79,7 +80,7 @@ then
         if [[ ${status_code} -ne 0 ]]; then
           echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
         else
-          docker logs $CONT_NAME &> ${DIR_TEST}/${TEST_LOG}
+          docker logs $CONT_NAME 2>&1 | tee -a ${PATH_LOG} ${DIR_TEST}/${TEST_LOG}
         fi
 
         echo "### ### Cleanup: ${CONT_NAME} ### ###"

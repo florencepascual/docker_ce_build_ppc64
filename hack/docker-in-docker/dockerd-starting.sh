@@ -1,22 +1,16 @@
 #!/bin/bash
 
-echo "Waiting for dockerd to start"
 TIMEOUT=10
 DAEMON="dockerd"
 i=0
-echo $TIMEOUT
 echo $DAEMON
-echo $i
 while [ $i -lt $TIMEOUT ] && ! /usr/bin/pgrep $DAEMON
 do
     i=$((i+1))
-    echo $i
     sleep 2
 done
 
 pid=`/usr/bin/pgrep $DAEMON`
-echo $pid
-
 
 if [ -z "$pid" ]
 then
