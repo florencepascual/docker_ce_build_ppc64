@@ -4,7 +4,7 @@ set -e
 
 echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
-. ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
+. ${PATH_SCRIPTS}/dockerd-starting.sh
 
 set -o allexport
 source env.list
