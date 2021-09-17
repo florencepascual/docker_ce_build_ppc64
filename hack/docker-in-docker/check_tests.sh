@@ -42,14 +42,14 @@ if [[ ${NB_BUILD_LOGS} -ne 0 ]] && [[ ${NB_TEST_LOGS} -ne 0 ]]
             # There is three tests : TestDistro, TestDistroInstallPackage and TestDistroPackageCheck
             TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
 
-            TEST_1=$(eval "cat $TEST_LOG | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
-            echo "TestDistro : $TEST_1" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+            TEST_1=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
+            echo "TestDistro : ${TEST_1}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
-            TEST_2=$(eval "cat $TEST_LOG | grep exitCode | awk 'NR==3' | cut -d' ' -f 3")
-            echo "TestDistroInstallPackage : $TEST_2" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+            TEST_2=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==3' | cut -d' ' -f 3")
+            echo "TestDistroInstallPackage : ${TEST_2}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
-            TEST_3=$(eval "cat $TEST_LOG | grep exitCode | awk 'NR==4' | cut -d' ' -f 3")
-            echo "TestDistroPackageCheck : $TEST_3" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+            TEST_3=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==4' | cut -d' ' -f 3")
+            echo "TestDistroPackageCheck : ${TEST_3}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
             [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
             echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
