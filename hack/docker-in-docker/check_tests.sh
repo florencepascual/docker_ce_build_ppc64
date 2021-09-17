@@ -4,20 +4,18 @@ set -o allexport
 source env.list
 source env-distrib.list
 
-PATH_TEST_ERRORS="/workspace/test_errors.txt"
-
-if ! test -f ${PATH_TEST_ERRORS}
-then 
-    touch ${PATH_TEST_ERRORS}
-else
-    rm ${PATH_TEST_ERRORS}
-    touch ${PATH_TEST_ERRORS}
-fi
 ls /workspace
 echo $DOCKER_VERS
 echo $CONTAINERD_VERS
 # check errors 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
+PATH_TEST_ERRORS="${DIR_TEST}/test_errors.txt"
+
+if ! test -f ${PATH_TEST_ERRORS}
+    echo "There is no file ${PATH_TEST_ERRORS} with the errors. "
+    # push ERROR
+fi
+
 ls ${DIR_TEST}
 # check that for each distrib of each packtype, we have a build log and a test log
 # check if no error in the test log
@@ -33,50 +31,42 @@ if [[ ${NB_BUILD_LOGS} -ne 0 ]] && [[ ${NB_TEST_LOGS} -ne 0 ]]
     if [[ ${NB_BUILD_LOGS} == ${NB_DISTROS} ]] && [[ ${NB_TEST_LOGS} == ${NB_DISTROS} ]]
     then
         echo "# Check tests #"
-        # check the test_logs
-        
-        echo $DISTROS
-        for DISTRO in ${DISTROS}
-        do
-            echo "## DISTRO $DISTRO ##" 2>&1 | tee -a ${PATH_TEST_ERRORS}
-            # There is three tests : TestDistro, TestDistroInstallPackage and TestDistroPackageCheck
-            TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
-
-            TEST_1=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
-            echo "TestDistro : ${TEST_1}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-
-            TEST_2=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==3' | cut -d' ' -f 3")
-            echo "TestDistroInstallPackage : ${TEST_2}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-
-            TEST_3=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==4' | cut -d' ' -f 3")
-            echo "TestDistroPackageCheck : ${TEST_3}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-
-            [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
-            echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-        done
         # check if there are any 1 in the ${PATH_TEST_ERRORS}
-        echo "### Check the files ###"
+        echo "## Check the files ##"
         TOTAL_ERRORS=$(eval "grep -c 1 ${PATH_TEST_ERRORS}")
         if [[ ${TOTAL_ERRORS} -eq 0 ]]
         then
             echo "There is no error in the test log files. We can push to the shared COS Bucket. " 
+            # push NO ERROR
         else 
-            echo "There are errors in the test log files. "
+            echo "We have every log but there are errors in the test log files. "
+            # push ERROR
         fi
     else 
         # error and push to cos bucket ERR
-        echo "There was an error of build."
+        echo "There are build or test log files missing. "
         # check which test log files are missing
         for DISTRO in ${DISTROS}
         do
             TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
             find ${TEST_LOG}
-            if [[ $? -eq 0 ]]
+            if [[ $? -ne 0 ]]
             then
+                # print the DISTRO in the {PATH_TEST_ERRORS} 
+                DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
+                DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
+                echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
+                echo "Missing : 1" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
             fi
         done
+        TOTAL_MISSING=$(eval "grep -c "Missing" ${PATH_TEST_ERRORS}")
+        TOTAL_1=$(eval "grep -c 1 ${PATH_TEST_ERRORS}")
+        TOTAL_ERRORS=$(expr ${TOTAL_1} - ${TOTAL_MISSING})
+        echo "There are ${TOTAL_MISSING} test log files missing and there are ${TOTAL_ERRORS} errors for the existing test log files."
+        # push ERROR
 
 
     fi
     echo "There are no build logs or no test logs." 2>&1 | tee -a ${PATH_LOG}
+    # push ERROR
 fi

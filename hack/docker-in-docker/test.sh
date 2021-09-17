@@ -8,6 +8,7 @@ source env-distrib.list
 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
+PATH_TEST_ERRORS="${DIR_TEST}/test_errors.txt"
 
 echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
@@ -73,11 +74,13 @@ then
         # check we have docker-ce packages and containerd packages and Dockerfile
 
         echo "### # Building the test image: ${IMAGE_NAME} # ###" 2>&1 | tee -a ${PATH_LOG}
-        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . 2>&1 | tee -a ${PATH_LOG} ${DIR_TEST}/${BUILD_LOG}
+        docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . 2>&1 | tee ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
-          echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'"
+          echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'" 2>&1 | tee -a ${PATH_LOG}
           continue
+        else
+          echo "docker build done" 2>&1 | tee -a ${PATH_LOG}
         fi
 
         echo "### ## Running the tests from the container: ${CONT_NAME} ## ###"
@@ -85,9 +88,10 @@ then
 
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
-          echo "ERROR: The test suite failed for ${DISTRO}. See details below from '${TEST_LOG}'"
+          echo "ERROR: The test suite failed for ${DISTRO}. See details from '${TEST_LOG}'" 2>&1 | tee -a ${PATH_LOG}
         else
-          docker logs $CONT_NAME 2>&1 | tee -a ${PATH_LOG} ${DIR_TEST}/${TEST_LOG}
+          docker logs $CONT_NAME 2>&1 | tee ${DIR_TEST}/${TEST_LOG}
+          echo "tests done" 2>&1 | tee -a ${PATH_LOG}
         fi
 
         echo "### ### Cleanup: ${CONT_NAME} ### ###"
@@ -97,8 +101,8 @@ then
         popd
         rm -rf tmp
         # check the logs
+        echo "### ### # Checking the logs # ### ###" 2>&1 | tee -a ${PATH_LOG}
         echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
-        TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
         TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
 
         TEST_1=$(eval "cat ${TEST_LOG} | grep exitCode | awk 'NR==2' | cut -d' ' -f 5")
@@ -112,6 +116,7 @@ then
 
         [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
         echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+        tail -5 ${PATH_TEST_ERRORS} 2>&1 | tee -a ${PATH_LOG}
       done
     done
   fi
