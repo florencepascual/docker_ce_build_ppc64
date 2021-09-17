@@ -11,15 +11,15 @@ source env.list
 source env-distrib.list
 
 if [ ! -z "$pid" ]
+then
+  if ! test -d /root/.docker 
   then
-    if ! test -d /root/.docker 
-    then
-      echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
-      mkdir /root/.docker
-      echo "$SECRET_AUTH" > /root/.docker/config.json
-    fi
-    if grep -Fq "index.docker.io" /root/.docker/config.json
-    then
+    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
+    mkdir /root/.docker
+    echo "$SECRET_AUTH" > /root/.docker/config.json
+  fi
+  if grep -Fq "index.docker.io" /root/.docker/config.json
+  then
     # docker login
     echo "### Building docker-ce ###" 2>&1 | tee -a ${PATH_LOG}
 
