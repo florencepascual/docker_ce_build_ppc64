@@ -59,7 +59,7 @@ then
     do
       echo "= Building for:${DEB} =" 2>&1 | tee -a ${PATH_LOG}
 
-      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz 2>&1 | tee -a ${PATH_LOG}
+      VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
     popd
 
@@ -69,7 +69,7 @@ then
     do
       echo "== Building for:${RPM} ==" 2>&1 | tee -a ${PATH_LOG}
 
-      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz 2>&1 | tee -a ${PATH_LOG}
+      VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
     popd
 
@@ -78,6 +78,7 @@ then
     cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
     rm -rf docker-ce-packaging
+    ls ${DIR_DOCKER} 2>&1 | tee -a ${PATH_LOG}
 
     if [[ ${CONTAINERD_VERS} != "0" ]]
     # CONTAINERD_VERS is equal to a version of containerd we want to build
@@ -95,13 +96,14 @@ then
 
       for DISTRO in $DISTROS
       do
-        make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO} 2>&1 | tee -a ${PATH_LOG}
+        make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO}
       done
 
       popd
 
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
+      ls ${DIR_CONTAINERD} 2>&1 | tee -a ${PATH_LOG}
     fi
 
     # Check if the docker-ce packages have been built
