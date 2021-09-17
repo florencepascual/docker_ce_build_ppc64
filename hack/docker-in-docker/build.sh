@@ -9,9 +9,12 @@ source ${PATH_SCRIPTS}/dockerd-starting.sh 2>&1 | tee -a ${PATH_LOG}
 set -o allexport
 source env.list
 source env-distrib.list
+echo "1"
 
 if [ ! -z "$pid" ]
 then
+  echo $pid
+  echo "X"
   if ! test -d /root/.docker 
   then
     echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
