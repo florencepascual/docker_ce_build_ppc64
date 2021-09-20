@@ -40,23 +40,22 @@ then
 fi
 
 # check we have the env.list, the dockertest and the containerd packages if CONTAINERD_VERS = 0
-if test -f /workspace/${FILE_ENV} && test -d ${PATH_DOCKERTEST}/dockertest
-then
-    if [[ ${CONTAINERD_VERS} = "0" ]]
-    then
-        if test -d /workspace/containerd-*
-        then
-            echo "The containerd packages have been copied." 2>&1 | tee -a ${PATH_LOG}
-            exit 0
-        else
-            echo "The containerd packages have not been copied." 2>&1 | tee -a ${PATH_LOG}
-            exit 1
-        fi
-    else
-        echo "The env.list and the dockertest directory have been copied." 2>&1 | tee -a ${PATH_LOG}
-        exit 0
-    fi
-else 
+if ! test -f /workspace/${FILE_ENV} && test -d ${PATH_DOCKERTEST}/dockertest
     echo "The env.list and/or the dockertest directory have not been copied." 2>&1 | tee -a ${PATH_LOG}
     exit 1
+fi
+
+if [[ ${CONTAINERD_VERS} = "0" ]]
+then
+    if test -d /workspace/containerd-*
+    then
+        echo "The containerd packages have been copied." 2>&1 | tee -a ${PATH_LOG}
+        exit 0
+    else
+        echo "The containerd packages have not been copied." 2>&1 | tee -a ${PATH_LOG}
+        exit 1
+    fi
+else
+    echo "The env.list and the dockertest directory have been copied." 2>&1 | tee -a ${PATH_LOG}
+    exit 0
 fi

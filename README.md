@@ -1,4 +1,6 @@
-# Cook Book
+# Cook Book to build docker and containerd without the automation
+
+Just for reference, deprecated
 
 ## Steps
 

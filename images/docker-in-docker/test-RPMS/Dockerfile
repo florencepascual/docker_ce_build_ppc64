@@ -1,4 +1,4 @@
-# Dockerfile for testing RPMs
+# Dockerfile to test RPMS packages
 
 ARG GOLANG_VERSION=1.15.2
 ARG DISTRO_NAME

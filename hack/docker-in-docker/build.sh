@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ue
 
 echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
@@ -135,12 +135,12 @@ then
     # if there is no packages built for docker or no packages built for containerd
     then 
       echo "No packages built for either docker, or containerd"
-      exit 1
+      #exit 1
     elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
     # if there are packages built for docker and packages built for containerd
     then
       echo "All packages built"
-      exit 0
+      #exit 0
     fi
   fi
 fi

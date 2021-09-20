@@ -5,7 +5,7 @@
 
 # $1 -> ERR or NOERR
 
-set -e
+set -ue
 
 PATH_COS="/mnt"
 PATH_PASSWORD="/root/.s3fs_cos_secret"
@@ -57,55 +57,46 @@ then
     s3fs ${COS_BUCKET_SHARED} ${PATH_COS}/s3_${COS_BUCKET_SHARED} -o url=${URL_COS_SHARED} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
     ls ${PATH_COS}/s3_${COS_BUCKET_SHARED}
 
-    ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-*/ 2>&1 | tee -a ${PATH_LOG}
+    
     # copy the builds into the COS Bucket ibm-docker-builds
+    # get the directory name "docker-ce-20.10-11" version without patch number then build tag
+    DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+    ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-*/ 2>&1 | tee -a ${PATH_LOG}
     if [[ $? -eq 0 ]]
     then
-        # get the directory name "docker-ce-20.10-11" version without patch number then build tag
-        # DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | sed -E 's|(v)([0-9.]+)([0-9]+)(.[0-9])|\2\3|'")
-        DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
         DOCKER_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-${DIR_DOCKER_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f6)
         DOCKER_BUILD_TAG=$((DOCKER_LAST_BUILD_TAG+1))
-        DIR_DOCKER_SHARED=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
-        # copy the package to the cos bucket
-        # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_DOCKER_SHARED}
-        echo "${DIR_DOCKER_SHARED} copied" 2>&1 | tee -a ${PATH_LOG}
-        echo "build tag ${DOCKER_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
+        
     else 
         # there are no directories yet
-        DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
         DOCKER_BUILD_TAG="1"
-        DIR_DOCKER_SHARED=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
-        # copy the package to the cos bucket
-        # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_DOCKER_SHARED}
-        echo "${DIR_DOCKER_SHARED} copied" 2>&1 | tee -a ${PATH_LOG}
-        echo "build tag ${DOCKER_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
     fi
+    DIR_DOCKER_SHARED=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
+    # copy the package to the cos bucket
+    # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_DOCKER_SHARED}
+    echo "${DIR_DOCKER_SHARED} copied" 2>&1 | tee -a ${PATH_LOG}
+    echo "build tag ${DOCKER_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
+
     if [[ ${CONTAINERD_VERS} != "0" ]]
     then
+        # get the directory name "containerd-1.4-9" version without patch number then build tag
+        DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
+
         ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/containerd-*/ 2>&1 | tee -a ${PATH_LOG}
         if [[ $? -eq 0 ]]
         then
-            # get the directory name "containerd-1.4-9" version without patch number then build tag
-            # DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | sed -E 's|(v)([0-9.]+)([0-9]+)(.[0-9])|\2\3|'")
-            DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
             CONTAINERD_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/containerd-${DIR_CONTAINERD_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f5)
             CONTAINERD_BUILD_TAG=$((CONTAINERD_LAST_BUILD_TAG+1))
-            DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
-            # copy the package to the cos bucket
-            # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_CONTAINERD}
-            echo "${DIR_CONTAINERD} copied" 2>&1 | tee -a ${PATH_LOG}
-            echo "build tag ${CONTAINERD_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
+            
         else
             # there are no directories yet
-            DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
             CONTAINERD_BUILD_TAG="1"
-            DIR_CONTAINERD=docker-ce-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
-            # copy the package to the cos bucket
-            # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_CONTAINERD}
-            echo "${DIR_CONTAINERD} copied" 2>&1 | tee -a ${PATH_LOG}
-            echo "build tag ${CONTAINERD_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
         fi
+        DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
+        # copy the package to the cos bucket
+        # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_CONTAINERD}
+        echo "${DIR_CONTAINERD} copied" 2>&1 | tee -a ${PATH_LOG}
+        echo "build tag ${CONTAINERD_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
     fi
 fi
 

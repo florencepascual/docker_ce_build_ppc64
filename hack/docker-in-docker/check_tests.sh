@@ -35,9 +35,8 @@ if [[ ${NB_BUILD_LOGS} -ne 0 ]] && [[ ${NB_TEST_LOGS} -ne 0 ]]
 then
     if [[ ${NB_BUILD_LOGS} == ${NB_DISTROS} ]] && [[ ${NB_TEST_LOGS} == ${NB_DISTROS} ]]
     then
-        echo "# Check tests #" 2>&1 | tee -a ${PATH_LOG}
         # check if there are any 1 in the ${PATH_TEST_ERRORS}
-        echo "## Check the files ##" 2>&1 | tee -a ${PATH_LOG}
+        echo "# Check the file #" 2>&1 | tee -a ${PATH_LOG}
         TOTAL_ERRORS=$(eval "grep -c 1 ${PATH_TEST_ERRORS}")
         if [[ ${TOTAL_ERRORS} -eq 0 ]]
         then

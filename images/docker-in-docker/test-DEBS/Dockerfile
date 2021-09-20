@@ -1,4 +1,4 @@
-# Dockerfile for testing DEBs
+# Dockerfile to test DEBS packages
 
 ARG GOLANG_VERSION=1.15.2
 ARG DISTRO_NAME
@@ -28,12 +28,10 @@ RUN echo deb;\
     wget \
     software-properties-common \
     lsb-release\
-    ##### Install go tests deps
     make\
     gcc\
     libc-dev\
     procps\
-    ##### Install docker-ce deps
     iptables libdevmapper1.02.1 && \
     rm -rf /var/lib/apt/lists/* 
 
