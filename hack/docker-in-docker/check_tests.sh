@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ue
+
 set -o allexport
 source env.list
 source env-distrib.list
