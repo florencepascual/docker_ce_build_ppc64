@@ -24,8 +24,8 @@ ls ${DIR_TEST} 2>&1 | tee -a ${PATH_LOG}
 NB_DEBS=$(eval "awk -F\- '{print NF-1}' /workspace/env-distrib.list | awk 'NR==1'")
 NB_RPMS=$(eval "awk -F\- '{print NF-1}' /workspace/env-distrib.list | awk 'NR==2'")
 NB_DISTROS=$(expr ${NB_DEBS} + ${NB_RPMS})
-NB_BUILD_LOGS=$(eval "find build* | wc -l")
-NB_TEST_LOGS=$(eval "find test* | wc -l")
+NB_BUILD_LOGS=$(eval "find ${DIR_TEST}/build* | wc -l")
+NB_TEST_LOGS=$(eval "find ${DIR_TEST}/test* | wc -l")
 echo ${NB_BUILD_LOGS} 2>&1 | tee -a ${PATH_LOG}
 echo ${NB_TEST_LOGS} 2>&1 | tee -a ${PATH_LOG}
 DISTROS=$(eval "echo $DEBS $RPMS | tr '-' '_'")
@@ -53,7 +53,7 @@ then
         # check which test log files are missing
         for DISTRO in ${DISTROS}
         do
-            TEST_LOG="/workspace/${DIR_TEST}/test_${DISTRO}.log"
+            TEST_LOG="${DIR_TEST}/test_${DISTRO}.log"
             find ${TEST_LOG} 2>&1 | tee -a ${PATH_LOG}
             if [[ $? -ne 0 ]]
             then
