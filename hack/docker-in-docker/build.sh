@@ -111,6 +111,7 @@ then
     if [[ $? -ne 0 ]]
     then
       # No packages built
+      echo "No packages built for docker"
       BOOL_DOCKER=0
     else
       # Packages built
@@ -121,6 +122,8 @@ then
     ls ${DIR_CONTAINERD}/*
     if [[ $? -ne 0 ]]
     then
+      # No packages built
+      echo "No packages built for containerd"
       BOOL_CONTAINERD=0
     else
       # Packages built
@@ -128,12 +131,7 @@ then
     fi
 
     # Check if all packages have been built
-    if [[ ${BOOL_DOCKER} -eq 0 ]] && [[ ${BOOL_CONTAINERD} -eq 0 ]]
-    # if there is no packages built for docker and no packages built for containerd
-    then
-      echo "No packages built for docker and for containerd"
-      exit 1
-    elif [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
+    if [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
     # if there is no packages built for docker or no packages built for containerd
     then 
       echo "No packages built for either docker, or containerd"
