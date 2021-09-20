@@ -41,6 +41,7 @@ fi
 
 # check we have the env.list, the dockertest and the containerd packages if CONTAINERD_VERS = 0
 if ! test -f /workspace/${FILE_ENV} && test -d ${PATH_DOCKERTEST}/dockertest
+then
     echo "The env.list and/or the dockertest directory have not been copied." 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     exit 1
 fi
