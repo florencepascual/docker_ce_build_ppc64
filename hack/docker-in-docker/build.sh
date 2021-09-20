@@ -2,7 +2,7 @@
 
 set -ue
 
-echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
+echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 . ${PATH_SCRIPTS}/dockerd-starting.sh
 
@@ -14,14 +14,14 @@ if [ ! -z "$pid" ]
 then
   if ! test -d /root/.docker 
   then
-    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG}
+    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     mkdir /root/.docker
     echo "$SECRET_AUTH" > /root/.docker/config.json
   fi
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
     # docker login
-    echo "### Building docker-ce ###" 2>&1 | tee -a ${PATH_LOG}
+    echo "### Building docker-ce ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
     DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
     mkdir ${DIR_DOCKER}
@@ -57,7 +57,7 @@ then
     patchDockerFiles .
     for DEB in ${DEBS}
     do
-      echo "= Building for:${DEB} =" 2>&1 | tee -a ${PATH_LOG}
+      echo "= Building for:${DEB} =" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
       VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     done
@@ -67,23 +67,23 @@ then
     patchDockerFiles .
     for RPM in ${RPMS}
     do
-      echo "== Building for:${RPM} ==" 2>&1 | tee -a ${PATH_LOG}
+      echo "== Building for:${RPM} ==" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
       VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
     done
     popd
 
-    echo "=== Copying packages to ${DIR_DOCKER} ===" 2>&1 | tee -a ${PATH_LOG}
+    echo "=== Copying packages to ${DIR_DOCKER} ===" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
     cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
     rm -rf docker-ce-packaging
-    ls ${DIR_DOCKER} 2>&1 | tee -a ${PATH_LOG}
+    ls ${DIR_DOCKER} 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
     if [[ ${CONTAINERD_VERS} != "0" ]]
     # CONTAINERD_VERS is equal to a version of containerd we want to build
     then
-      echo "= Building containerd =" 2>&1 | tee -a ${PATH_LOG}
+      echo "= Building containerd =" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
       
       DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
       mkdir ${DIR_CONTAINERD}
@@ -103,7 +103,7 @@ then
 
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
-      ls ${DIR_CONTAINERD} 2>&1 | tee -a ${PATH_LOG}
+      ls ${DIR_CONTAINERD} 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     fi
 
     # Check if the docker-ce packages have been built
@@ -111,7 +111,7 @@ then
     if [[ $? -ne 0 ]]
     then
       # No packages built
-      echo "No packages built for docker"
+      echo "No packages built for docker" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
       BOOL_DOCKER=0
     else
       # Packages built
@@ -123,7 +123,7 @@ then
     if [[ $? -ne 0 ]]
     then
       # No packages built
-      echo "No packages built for containerd"
+      echo "No packages built for containerd" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
       BOOL_CONTAINERD=0
     else
       # Packages built
@@ -134,12 +134,12 @@ then
     if [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
     # if there is no packages built for docker or no packages built for containerd
     then 
-      echo "No packages built for either docker, or containerd"
+      echo "No packages built for either docker, or containerd" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
       #exit 1
     elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
     # if there are packages built for docker and packages built for containerd
     then
-      echo "All packages built"
+      echo "All packages built" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
       #exit 0
     fi
   fi

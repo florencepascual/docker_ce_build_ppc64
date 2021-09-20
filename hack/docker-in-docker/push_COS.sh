@@ -32,13 +32,13 @@ s3fs ${COS_BUCKET_PRIVATE} ${PATH_COS}/s3_${COS_BUCKET_PRIVATE} -o url=${URL_COS
 # if there are no errors
 if [[ $1 -eq "NOERR" ]]
 then
-    echo "- NOERR ppc64le-docker -" 2>&1 | tee -a ${PATH_LOG}
+    echo "- NOERR ppc64le-docker -" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     # delete the last packages (both if CONTAINERD_VERS != 0)
     # remove last version of docker-ce and last tests
     # rm -rf ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/docker-ce-*
     # rm -rf ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/test-*
-    echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/docker-ce-* deleted" 2>&1 | tee -a ${PATH_LOG}
-    echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/test-* deleted" 2>&1 | tee -a ${PATH_LOG}
+    echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/docker-ce-* deleted" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+    echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/test-* deleted" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     
 
     if [[ ${CONTAINERD_VERS} != "0" ]]
@@ -46,10 +46,10 @@ then
     then
         # remove last version of containerd and last tests
         # rm -rf ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/containerd-*
-        echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/containerd-* deleted" 2>&1 | tee -a ${PATH_LOG}
+        echo "${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/containerd-* deleted" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     fi
 
-    echo "- NOERR ibm-docker-builds -" 2>&1 | tee -a ${PATH_LOG}
+    echo "- NOERR ibm-docker-builds -" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     # ibm-docker-builds
 
     mkdir -p ${PATH_COS}/s3_${COS_BUCKET_SHARED}
@@ -61,7 +61,7 @@ then
     # copy the builds into the COS Bucket ibm-docker-builds
     # get the directory name "docker-ce-20.10-11" version without patch number then build tag
     DIR_DOCKER_VERS=$(eval "echo ${DOCKER_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
-    ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-*/ 2>&1 | tee -a ${PATH_LOG}
+    ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-*/ 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     if [[ $? -eq 0 ]]
     then
         DOCKER_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/docker-ce-${DIR_DOCKER_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f6)
@@ -74,15 +74,15 @@ then
     DIR_DOCKER_SHARED=docker-ce-${DIR_DOCKER_VERS}-${DOCKER_BUILD_TAG}
     # copy the package to the cos bucket
     # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_DOCKER_SHARED}
-    echo "${DIR_DOCKER_SHARED} copied" 2>&1 | tee -a ${PATH_LOG}
-    echo "build tag ${DOCKER_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
+    echo "${DIR_DOCKER_SHARED} copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+    echo "build tag ${DOCKER_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
     if [[ ${CONTAINERD_VERS} != "0" ]]
     then
         # get the directory name "containerd-1.4-9" version without patch number then build tag
         DIR_CONTAINERD_VERS=$(eval "echo ${CONTAINERD_VERS} | cut -d'v' -f2 | cut -d'.' -f1-2")
 
-        ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/containerd-*/ 2>&1 | tee -a ${PATH_LOG}
+        ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/containerd-*/ 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
         if [[ $? -eq 0 ]]
         then
             CONTAINERD_LAST_BUILD_TAG=$(ls -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/containerd-${DIR_CONTAINERD_VERS}-* | sort --version-sort | tail -1| cut -d'-' -f5)
@@ -95,18 +95,18 @@ then
         DIR_CONTAINERD=containerd-${DIR_CONTAINERD_VERS}-${CONTAINERD_BUILD_TAG}
         # copy the package to the cos bucket
         # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_CONTAINERD}
-        echo "${DIR_CONTAINERD} copied" 2>&1 | tee -a ${PATH_LOG}
-        echo "build tag ${CONTAINERD_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOG}
+        echo "${DIR_CONTAINERD} copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "build tag ${CONTAINERD_BUILD_TAG}" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     fi
 fi
 
-echo "-- ERR and NOERR ppc64le-docker --" 2>&1 | tee -a ${PATH_LOG}
+echo "-- ERR and NOERR ppc64le-docker --" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
 # !!! TEST !!!
 mkdir -p ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST
 
 # push packages, no matter what $1 is
-ls -d /workspace/docker-ce-* 2>&1 | tee -a ${PATH_LOG}
+ls -d /workspace/docker-ce-* 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 if [[ $? -eq 0]]
     # copy the builds into the COS Bucket ppc64le-docker and the tests
     DIR_DOCKER_PRIVATE=docker-ce-${DOCKER_VERS}
@@ -114,8 +114,8 @@ if [[ $? -eq 0]]
     # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_DOCKER_PRIVATE}
     # cp -r /workspace/test-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
     # cp -r /workspace/*.log ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
-    echo "${DIR_DOCKER_PRIVATE} copied" 2>&1 | tee -a ${PATH_LOG}
-    echo "/workspace/test-* copied" 2>&1 | tee -a ${PATH_LOG}
+    echo "${DIR_DOCKER_PRIVATE} copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+    echo "/workspace/test-* copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     # !!! TEST !!!
     cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/${DIR_DOCKER_PRIVATE}
     cp -r /workspace/test-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/
@@ -125,13 +125,13 @@ fi
 if [[ ${CONTAINERD_VERS} != "0" ]]
 # if CONTAINERD_VERS contains a version of containerd
 then
-    ls -d /workspace/containerd-* 2>&1 | tee -a ${PATH_LOG}
+    ls -d /workspace/containerd-* 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     if [[ $? -eq 0]]
         # copy the builds in the COS bucket ppc64le-docker
         DIR_CONTAINERD_PRIVATE=containerd-${CONTAINERD_VERS}
         # copy the package to the cos bucket
         # cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_CONTAINERD_PRIVATE}
-        echo "${DIR_CONTAINERD_PRIVATE} copied" 2>&1 | tee -a ${PATH_LOG}
+        echo "${DIR_CONTAINERD_PRIVATE} copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
         # !!! TEST !!!
         cp -r /workspace/containerd-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/${DIR_CONTAINERD_PRIVATE}
     fi
@@ -143,14 +143,14 @@ fi
 # check TEST dir in ppc64le-docker
 # check ibm-docker-builds mnt 
 
-ls ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST 2>&1 | tee -a ${PATH_LOG}
+ls ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 
 if [[ test -d ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST ]]
 then
-    echo "Packages in the private COS Bucket" 2>&1 | tee -a ${PATH_LOG}
+    echo "Packages in the private COS Bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     BOOL_PRIVATE=0
 else
-    echo "Packages not in the private COS Bucket" 2>&1 | tee -a ${PATH_LOG}
+    echo "Packages not in the private COS Bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     exit 1
 fi
 
@@ -158,37 +158,37 @@ if [[ $1 -eq "NOERR" ]] && [[ BOOL_PRIVATE -eq 0 ]]
 then
     if [[ test -d ${PATH_COS}/s3_${COS_BUCKET_SHARED} ]]
     then
-        ls ${PATH_COS}/s3_${COS_BUCKET_SHARED} 2>&1 | tee -a ${PATH_LOG}
-        echo "No error in the tests and shared bucket mounted." 2>&1 | tee -a ${PATH_LOG}
+        ls ${PATH_COS}/s3_${COS_BUCKET_SHARED} 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "No error in the tests and shared bucket mounted." 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
         exit 0
     else 
-        echo "No error in the tests but shared bucket not mounted." 2>&1 | tee -a ${PATH_LOG}
+        echo "No error in the tests but shared bucket not mounted." 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
         exit 1
     fi
 elif [[ $1 -eq "ERR" ]] && [[ BOOL_PRIVATE -eq 0 ]]
-    echo "There was some errors in the test, the packages have been pushed only to the private COS Bucket." 2>&1 | tee -a ${PATH_LOG}
+    echo "There was some errors in the test, the packages have been pushed only to the private COS Bucket." 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     exit 0
 fi
 
 
 # if [[ test -d  ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_DOCKER_PRIVATE} ]] && [[ test -d ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/test-* ]]
 # then
-#     echo "DOCKER_CE and TEST in the private COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#     echo "DOCKER_CE and TEST in the private COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #     if [[ ${CONTAINERD_VERS} != "0" ]] 
 #     then
 #         if [[ test -d ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_CONTAINERD_PRIVATE} ]]
 #         then
 #             # packages pushed to the private cos bucket
-#             echo "CONTAINERD in the private COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#             echo "CONTAINERD in the private COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #             BOOL_PRIVATE=1
 #         else
 #             # packages not pushed to the private cos bucket
-#             echo "CONTAINERD not in the private COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#             echo "CONTAINERD not in the private COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #             exit 1
 #         fi
 #     fi
 # else
-#     echo "DOCKER_CE and TEST not in the private COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#     echo "DOCKER_CE and TEST not in the private COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #     exit 1 
 # fi
 
@@ -196,19 +196,19 @@ fi
 # then
 #     if [[ test -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_DOCKER_SHARED} ]]
 #     then
-#         echo "DOCKER_CE and TEST in the shared COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#         echo "DOCKER_CE and TEST in the shared COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #         if [[ test -d ${PATH_COS}/s3_${COS_BUCKET_SHARED}/${DIR_CONTAINERD} ]]
 #             then
 #                 # packages pushed to the shared cos bucket
-#                 echo "CONTAINERD in the shared COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#                 echo "CONTAINERD in the shared COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #                 exit 0
 #             else
 #                 # packages not pushed to the shared cos bucket
-#                 echo "CONTAINERD not in the shared COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#                 echo "CONTAINERD not in the shared COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #                 exit 1
 #         fi
 #     else 
-#         echo "DOCKER_CE and TEST not in the shared COS bucket" 2>&1 | tee -a ${PATH_LOG}
+#         echo "DOCKER_CE and TEST not in the shared COS bucket" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
 #         exit 0
 #     fi
 # elif $1 is ERR and BOOL_PRIVATE =0
