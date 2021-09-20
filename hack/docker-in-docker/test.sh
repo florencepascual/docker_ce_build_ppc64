@@ -73,7 +73,7 @@ then
         cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
         # check we have docker-ce packages and containerd packages and Dockerfile
 
-        echo "### # Building the test image: ${IMAGE_NAME} # ###" 2>&1 | tee -a ${PATH_LOG}
+        echo "### ## Building the test image: ${IMAGE_NAME} ## ###" 2>&1 | tee -a ${PATH_LOG}
         docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . 2>&1 | tee ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
@@ -102,7 +102,7 @@ then
         popd
         rm -rf tmp
         # check the logs
-        if test -f ${TEST_LOG}
+        if test -f /workspace/${DIR_TEST}/${TEST_LOG}
         then
           echo "### ### # Checking the logs # ### ###" 2>&1 | tee -a ${PATH_LOG}
           echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
