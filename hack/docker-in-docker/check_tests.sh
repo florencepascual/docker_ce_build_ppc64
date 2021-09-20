@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ue
+
 set -o allexport
 source env.list
 source env-distrib.list
@@ -9,7 +11,7 @@ echo $DOCKER_VERS
 echo $CONTAINERD_VERS
 # check errors 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
-PATH_TEST_ERRORS="${DIR_TEST}/test_errors.txt"
+PATH_TEST_ERRORS="${DIR_TEST}/errors.txt"
 
 if ! test -f ${PATH_TEST_ERRORS}
 then
