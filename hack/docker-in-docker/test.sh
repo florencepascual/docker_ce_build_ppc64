@@ -102,7 +102,7 @@ then
         popd
         rm -rf tmp
         # check the logs
-        if test -f /workspace/${DIR_TEST}/${TEST_LOG}
+        if test -f ${DIR_TEST}/${TEST_LOG}
         then
           echo "### ### # Checking the logs # ### ###" 2>&1 | tee -a ${PATH_LOG}
           echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
