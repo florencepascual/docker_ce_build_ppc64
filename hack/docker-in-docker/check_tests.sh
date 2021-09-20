@@ -56,12 +56,11 @@ if [[ ${NB_BUILD_LOGS} -ne 0 ]] && [[ ${NB_TEST_LOGS} -ne 0 ]]
                 DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
                 DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
                 echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
-                echo "Missing : 1" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
+                echo "Missing" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
             fi
         done
         TOTAL_MISSING=$(eval "grep -c "Missing" ${PATH_TEST_ERRORS}")
-        TOTAL_1=$(eval "grep -c 1 ${PATH_TEST_ERRORS}")
-        TOTAL_ERRORS=$(expr ${TOTAL_1} - ${TOTAL_MISSING})
+        TOTAL_ERRORS=$(eval "grep -c 1 ${PATH_TEST_ERRORS}")
         echo "There are ${TOTAL_MISSING} test log files missing and there are ${TOTAL_ERRORS} errors for the existing test log files."
         # push ERROR
 
