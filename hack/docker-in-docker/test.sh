@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ue
 
 set -o allexport
 source env.list
@@ -8,7 +8,7 @@ source env-distrib.list
 
 DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}"
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
-PATH_TEST_ERRORS="${DIR_TEST}/test_errors.txt"
+PATH_TEST_ERRORS="${DIR_TEST}/errors.txt"
 
 echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
@@ -83,7 +83,7 @@ then
           echo "docker build done" 2>&1 | tee -a ${PATH_LOG}
         fi
 
-        echo "### ## Running the tests from the container: ${CONT_NAME} ## ###"
+        echo "### ## Running the tests from the container: ${CONT_NAME} ## ###" 2>&1 | tee -a ${PATH_LOG}
         docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${IMAGE_NAME}
 
         status_code="$(docker container wait $CONT_NAME)"
