@@ -113,13 +113,13 @@ if [[ $? -eq 0]]
     # copy the package to the cos bucket
     # cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/${DIR_DOCKER_PRIVATE}
     # cp -r /workspace/test-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
-    # cp -r /workspace/*.log ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
+    # cp -r /workspace/logs-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/
     echo "${DIR_DOCKER_PRIVATE} copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     echo "/workspace/test-* copied" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
     # !!! TEST !!!
     cp -r /workspace/docker-ce-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/${DIR_DOCKER_PRIVATE}
     cp -r /workspace/test-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/
-    cp -r /workspace/*.log ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/
+    cp -r /workspace/logs-* ${PATH_COS}/s3_${COS_BUCKET_PRIVATE}/prow-docker/TEST/
 fi
 
 if [[ ${CONTAINERD_VERS} != "0" ]]
