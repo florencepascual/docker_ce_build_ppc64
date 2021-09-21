@@ -1,4 +1,5 @@
 #!/bin/bash
+# Script setting up the tests for each distro
 
 set -ue
 
@@ -10,12 +11,15 @@ DIR_TEST="/workspace/test_docker-ce-${DOCKER_VERS}_containerd-${CONTAINERD_VERS}
 PATH_DOCKERFILE="/workspace/docker_ce_build_ppc64/images/docker-in-docker/test"
 PATH_TEST_ERRORS="${DIR_TEST}/errors.txt"
 
-echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ${PATH_SCRIPTS}/dockerd-starting.sh
 
-if [ ! -z "$pid" ]
+if [ -z "$pid" ]
 then
+  echo "There is no docker daemon." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+  exit 1
+else
   if ! test -d ${DIR_TEST}
   then
     mkdir -p "${DIR_TEST}"
@@ -27,22 +31,22 @@ then
     rm ${PATH_TEST_ERRORS}
     touch ${PATH_TEST_ERRORS}
   fi
+  # PART TO REMOVE
   if ! test -d /root/.docker 
   then
-    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+    echo "# Docker login #" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
     mkdir /root/.docker
-    echo "${SECRET_AUTH}" > /root/.docker/config.json
+    echo "${DOCKER_SECRET_AUTH}" > /root/.docker/config.json
   fi
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
-    
     for PACKTYPE in DEBS RPMS
     do
-      echo "### Looking for distro type: ${PACKTYPE} ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
-      
+      echo "## Looking for distro type: ${PACKTYPE} ##" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+
       for DISTRO in ${!PACKTYPE} 
       do
-        echo "### # Looking for ${DISTRO} # ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "### Looking for ${DISTRO} ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
         DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
         IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"
@@ -61,7 +65,7 @@ then
           mkdir tmp
         fi
         pushd tmp
-        echo "### ## Copying the packages and the dockerfile for ${DISTRO} ## ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "### # Copying the packages and the dockerfile for ${DISTRO} # ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         # copy the docker_ce
         cp /workspace/docker-ce-${DOCKER_VERS}/bundles-ce-${DISTRO_NAME}-${DISTRO_VERS}-ppc64le.tar.gz /workspace/tmp
         # copy the containerd
@@ -73,29 +77,29 @@ then
         cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
         # check we have docker-ce packages and containerd packages and Dockerfile
 
-        echo "### ## Building the test image: ${IMAGE_NAME} ## ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "### # Building the test image: ${IMAGE_NAME} # ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} --build-arg DOCKER_VERS=${DOCKER_VERS} --build-arg CONTAINERD_VERS=${CONTAINERD_VERS} . 2>&1 | tee ${DIR_TEST}/${BUILD_LOG}
 
         if [[ $? -ne 0 ]]; then
-          echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
           continue
         else
-          echo "docker build done" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "docker build done" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         fi
 
-        echo "### ## Running the tests from the container: ${CONT_NAME} ## ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+        echo "### # Running the tests from the container: ${CONT_NAME} # ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         docker run --env SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${IMAGE_NAME}
 
         status_code="$(docker container wait $CONT_NAME)"
         if [[ ${status_code} -ne 0 ]]; then
-          echo "ERROR: The test suite failed for ${DISTRO}. See details from '${TEST_LOG}'" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "ERROR: The test suite failed for ${DISTRO}. See details from '${TEST_LOG}'" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
           docker logs $CONT_NAME 2>&1 | tee ${DIR_TEST}/${TEST_LOG}
         else
           docker logs $CONT_NAME 2>&1 | tee ${DIR_TEST}/${TEST_LOG}
-          echo "tests done" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "Tests done" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         fi
 
-        echo "### ### Cleanup: ${CONT_NAME} ### ###"
+        echo "### # Cleanup: ${CONT_NAME} # ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         docker stop ${CONT_NAME}
         docker rm ${CONT_NAME}
         docker image rm ${IMAGE_NAME}
@@ -104,9 +108,9 @@ then
         # check the logs
         if test -f ${DIR_TEST}/${TEST_LOG}
         then
-          echo "### ### Checking the logs ### ###" 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "### # Checking the logs # ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
           echo "DISTRO ${DISTRO_NAME} ${DISTRO_VERS}" 2>&1 | tee -a ${PATH_TEST_ERRORS}
-
+          
           TEST_1=$(eval "cat ${DIR_TEST}/${TEST_LOG} | grep exitCode | awk 'NR==2' | rev | cut -d' ' -f 1")
           echo "TestDistro : ${TEST_1}" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
@@ -118,9 +122,9 @@ then
 
           [[ "$TEST_1" -eq "0" ]] && [[ "$TEST_2" -eq "0" ]] && [[ "$TEST_3" -eq "0" ]]
           echo "All : $?" 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-          tail -5 ${PATH_TEST_ERRORS} 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          tail -5 ${PATH_TEST_ERRORS} 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         else 
-          echo "There is no ${TEST_LOG} file." 2>&1 | tee -a ${PATH_LOGS}/${NAME_LOG_PROWJOB}
+          echo "There is no ${TEST_LOG} file." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
         fi
       done
     done

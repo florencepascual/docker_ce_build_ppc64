@@ -1,0 +1,36 @@
+# pod to test the build of docker and containerd with the docker and s3 secrets
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-dind-docker-build
+spec:
+  automountServiceAccountToken: false
+  containers:
+  - name: test
+    command:
+    - /usr/local/bin/dockerd-entrypoint.sh
+    image: quay.io/florencepascual/docker_ce_build
+    resources: {}
+    terminationMessagePolicy: FallbackToLogsOnError
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
+    env:
+      - name: DOCKER_SECRET_AUTH
+        valueFrom:
+          secretKeyRef:
+            name: docker-token
+            key: .dockerconfigjson
+      - name: S3_SECRET_AUTH
+        valueFrom:
+          secretKeyRef:
+            name: secret-s3
+            key: password
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 18
+  volumes:
+  - name: docker-graph-storage
+    emptyDir: {}
+status: {}  

@@ -47,7 +47,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iptables libdevmapper1.02.1 \
     && rm -rf /var/lib/apt/lists/*
 
-
 RUN mkdir -p /workspace/tmp
 
 RUN set -eux; \

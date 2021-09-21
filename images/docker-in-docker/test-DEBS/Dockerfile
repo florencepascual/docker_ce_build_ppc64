@@ -18,7 +18,6 @@ ENV WORKSPACE=/workspace \
     TERM=xterm
 ENV PATH /usr/local/go/bin:$PATH
 
-
 RUN echo deb;\
     apt-get update && apt-get install -y --no-install-recommends \
     apt-transport-https \
