@@ -1,5 +1,9 @@
 #!/bin/bash
 # Script building the static docker packages
+# in the directory docker-ce-v20.10.9 where there is a static directory with the script
+# docker run -d -v /home/fpascual/docker-ce-v20.10.9:/workspace --privileged quay.io/powercloud/docker-ce-build -name docker-build-static 
+# docker exec -it docker-build-static /bin/bash
+# ./static/build_static.sh
 
 set -ue
 
