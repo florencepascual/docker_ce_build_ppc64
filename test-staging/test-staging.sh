@@ -42,8 +42,6 @@ else
         for PACKTYPE in DEBS RPMS
         do
             echo "## Looking for distro type: ${PACKTYPE} ##" 
-            # Copying
-            cp ${PATH_SCRIPTS}/test_launch.sh ${PATH_DOCKERFILE}-${PACKTYPE}
 
             for DISTRO in ${!PACKTYPE} 
             do
@@ -65,8 +63,16 @@ else
                     mkdir tmp
                 fi
 
+                pushd tmp
+                echo "### # Copying the packages and the dockerfile for ${DISTRO} # ###" 
+                # copy the Dockerfile
+                cp ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile /workspace/tmp
+                # copy the test_launch.sh which will be copied in /usr/local/bin
+                cp ${PATH_SCRIPTS}/test_launch.sh /workspace/tmp
+
+
                 echo "### # Building the test image: ${IMAGE_NAME} # ###"
-                docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} ${PATH_DOCKERFILE}-${PACKTYPE}
+                docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} .
 
                 if [[ $? -ne 0 ]]; then
                     echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'"
@@ -91,7 +97,9 @@ else
                 docker stop ${CONT_NAME}
                 docker rm ${CONT_NAME}
                 docker image rm ${IMAGE_NAME}
-
+                popd
+                rm -rf tmp
+                # check the logs
                 if test -f ${DIR_TEST}/${TEST_LOG}
                 then
                     echo "### # Checking the logs # ###"
