@@ -5,9 +5,7 @@ set -ue
 
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ${PATH_SCRIPTS}/dockerd-starting.sh
-
 docker version 2>&1 | tee -a ${PATH_TEST_ERRORS} 
-containerd --version 2>&1 | tee -a ${PATH_TEST_ERRORS} 
 
 echo "= Docker test suite for ${DISTRO_NAME} ="
 export GOPATH=${WORKSPACE}/test:/go
