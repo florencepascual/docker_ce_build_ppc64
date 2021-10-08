@@ -37,12 +37,6 @@ else
         rm ${PATH_TEST_ERRORS}
         touch ${PATH_TEST_ERRORS}
     fi
-    if ! test -d /root/.docker 
-    then
-        echo "# Docker login #" 
-        mkdir /root/.docker
-        echo "${DOCKER_SECRET_AUTH}" > /root/.docker/config.json
-    fi
     if grep -Fq "index.docker.io" /root/.docker/config.json
     then
         for PACKTYPE in DEBS RPMS
