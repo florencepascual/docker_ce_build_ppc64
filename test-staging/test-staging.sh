@@ -1,7 +1,7 @@
 #/bin/bash
 
 ##
-# docker run -d -v /home/fpascual:/workspace -v /root/.docker/config.json:/root/.docker/config.json --privileged --name docker-test-staging quay.io/powercloud/docker-ce-build
+# docker run -d -v /home/fpascual:/workspace -v /home/fpascual/.docker/config.json:/root/.docker/config.json --privileged --name docker-test-staging quay.io/powercloud/docker-ce-build
 # docker exec -it docker-test-staging /bin/bash
 ##
 #set -eux
@@ -82,7 +82,7 @@ else
                 fi
 
                 echo "### # Running the tests from the container: ${CONT_NAME} # ###"
-                docker run --env DOCKER_SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS -d -v /workspace:/workspace --privileged --name $CONT_NAME ${IMAGE_NAME}
+                docker run --env DOCKER_SECRET_AUTH --env DISTRO_NAME --env PATH_SCRIPTS --env PATH_TEST_ERRORS -d -v /workspace:/workspace -v /root/.docker/config.json:/root/.docker/config.json --privileged --name $CONT_NAME ${IMAGE_NAME}
 
                 status_code="$(docker container wait $CONT_NAME)"
                 if [[ ${status_code} -ne 0 ]]; then
