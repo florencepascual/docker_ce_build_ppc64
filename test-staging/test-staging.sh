@@ -72,7 +72,7 @@ else
                 fi
 
                 echo "### # Building the test image: ${IMAGE_NAME} # ###"
-                docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} ${PATH_DOCKERFILE}-${PACKTYPE}/Dockerfile
+                docker build -t ${IMAGE_NAME} --build-arg DISTRO_NAME=${DISTRO_NAME} --build-arg DISTRO_VERS=${DISTRO_VERS} ${PATH_DOCKERFILE}-${PACKTYPE}
 
                 if [[ $? -ne 0 ]]; then
                     echo "ERROR: docker build failed for ${DISTRO}, see details from '${BUILD_LOG}'"
