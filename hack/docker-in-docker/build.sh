@@ -3,7 +3,7 @@
 
 set -ue
 
-echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+echo "# Dockerd #" 
 sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 . ${PATH_SCRIPTS}/dockerd-starting.sh
 
@@ -13,19 +13,19 @@ source env-distrib.list
 
 if [ -z "$pid" ]
 then
-  echo "There is no docker daemon." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+  echo "There is no docker daemon." 
   exit 1
 else
   # PART TO REMOVE
   if ! test -d /root/.docker 
   then
-    echo "## Docker login ##" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "## Docker login ##" 
     mkdir /root/.docker
     echo "$DOCKER_SECRET_AUTH" > /root/.docker/config.json
   fi
   if grep -Fq "index.docker.io" /root/.docker/config.json
   then
-    echo "## Building docker-ce ##" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "## Building docker-ce ##" 
 
     DIR_DOCKER="/workspace/docker-ce-${DOCKER_VERS}"
     mkdir ${DIR_DOCKER}
@@ -61,15 +61,15 @@ else
     patchDockerFiles .
     for DEB in ${DEBS}
     do
-      echo "= Building for: ${DEB} =" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "= Building for: ${DEB} =" 
 
       VERSION=${DOCKER_VERS} make debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
     
       if test -f debbuild/bundles-ce-${DEB}-ppc64le.tar.gz
       then
-        echo "${DEB} built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "${DEB} built" 
       else
-        echo "${DEB} not built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "${DEB} not built" 
       fi
     done
     popd
@@ -78,30 +78,30 @@ else
     patchDockerFiles .
     for RPM in ${RPMS}
     do
-      echo "== Building for: ${RPM} ==" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "== Building for: ${RPM} ==" 
 
       VERSION=${DOCKER_VERS} make rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
 
       if test -f rpmbuild/bundles-ce-${RPM}-ppc64le.tar.gz
       then
-        echo "${RPM} built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "${RPM} built" 
       else
-        echo "${RPM} not built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "${RPM} not built" 
       fi
     done
     popd
 
-    echo "=== Copying packages to ${DIR_DOCKER} ===" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "=== Copying packages to ${DIR_DOCKER} ===" 
 
     cp -r docker-ce-packaging/deb/debbuild/* ${DIR_DOCKER}
     cp -r docker-ce-packaging/rpm/rpmbuild/* ${DIR_DOCKER}
     rm -rf docker-ce-packaging
-    ls ${DIR_DOCKER} 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    ls ${DIR_DOCKER} 
 
     if [[ ${CONTAINERD_VERS} != "0" ]]
     # if CONTAINERD_VERS is equal to a version of containerd we want to build
     then
-      echo "### Building containerd ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "### Building containerd ###" 
 
       DIR_CONTAINERD="/workspace/containerd-${CONTAINERD_VERS}"
       mkdir ${DIR_CONTAINERD}
@@ -114,24 +114,24 @@ else
 
       for DISTRO in $DISTROS
       do
-        echo "= Building for: ${DISTRO} =" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "= Building for: ${DISTRO} =" 
         make REF=${CONTAINERD_VERS} docker.io/library/${DISTRO}
         DISTRO_NAME="$(cut -d':' -f1 <<<"${DISTRO}")"
         DISTRO_VERS="$(cut -d':' -f2 <<<"${DISTRO}")"
 
         if test -d build/${DISTRO_NAME}/${DISTRO_VERS}
         then
-          echo "${DISTRO} built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+          echo "${DISTRO} built" 
         else
-          echo "${DISTRO} not built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+          echo "${DISTRO} not built" 
         fi
       done
 
       popd
-      echo "=== Copying packages to ${DIR_CONTAINERD} ===" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "=== Copying packages to ${DIR_CONTAINERD} ===" 
       cp -r containerd-packaging/build/* ${DIR_CONTAINERD}
       rm -rf containerd-packaging
-      ls ${DIR_CONTAINERD} 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      ls ${DIR_CONTAINERD} 
     fi
 
     # Check if the docker-ce packages have been built
@@ -139,7 +139,7 @@ else
     if [[ $? -ne 0 ]]
     then
       # No packages built
-      echo "No packages built for docker" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "No packages built for docker" 
       BOOL_DOCKER=0
     else
       # Packages built
@@ -151,7 +151,7 @@ else
     if [[ $? -ne 0 ]]
     then
       # No packages built
-      echo "No packages built for containerd" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "No packages built for containerd" 
       BOOL_CONTAINERD=0
     else
       # Packages built
@@ -162,12 +162,12 @@ else
     if [[ ${BOOL_DOCKER} -eq 0 ]] || [[ ${BOOL_CONTAINERD} -eq 0 ]]
     # if there is no packages built for docker or no packages built for containerd
     then 
-      echo "No packages built for either docker, or containerd" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "No packages built for either docker, or containerd" 
       exit 1
     elif [[ ${BOOL_DOCKER} -eq 1 ]] && [[ ${BOOL_CONTAINERD} -eq 1 ]]
     # if there are packages built for docker and packages built for containerd
     then
-      echo "All packages built" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+      echo "All packages built" 
       exit 0
     fi
   fi

@@ -1,21 +1,8 @@
 #/bin/bash
 
 ##
-# Test the docker-ce and containerd packages by creating
-#  a Docker in Docker image.
-#
-# The containerd and docker-ce packages are dowloaded from an http server,
-# as specified in the $LOCAL_WEB_SERVER. See the Dockerfile under DEBS and RPMS.
-#
-#
-# The test countainer is mounted with ~/.docker so that
-# the dockerbub credential is used to workaround the docker pull limit.
-#
-# Important:
-#  - Please do a 'docker login' prior launching this script.
-#  - Make sure a local http server is running such as:
-# (cd /package2test/ && nohup python3 -m http.server 8080 > ~/http.log  2>&1) &
-#
+# docker run -d -v /home/fpascual:/workspace -v /root/.docker/config.json:/root/.docker/config.json --privileged --name docker-test-staging quay.io/powercloud/docker-ce-build
+# docker exec -it docker-test-staging /bin/bash
 ##
 #set -eux
 
@@ -30,13 +17,13 @@ PATH_DOCKERFILE="${PATH_SCRIPTS}/test-staging/test"
 PATH_TEST_ERRORS="${DIR_TEST}/errors.txt"
 
 
-echo "# Dockerd #" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
-sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
+echo "# Dockerd #" 
+# sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
 source ${PATH_SCRIPTS}/dockerd-starting.sh
 
 if [ -z "$pid" ]
 then
-    echo "There is no docker daemon." 2>&1 | tee -a ${PATH_LOG_PROWJOB} 
+    echo "There is no docker daemon."  
     exit 1
 else
     if ! test -d ${DIR_TEST}
@@ -52,7 +39,7 @@ else
     fi
     if ! test -d /root/.docker 
     then
-        echo "# Docker login #" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "# Docker login #" 
         mkdir /root/.docker
         echo "${DOCKER_SECRET_AUTH}" > /root/.docker/config.json
     fi
@@ -60,13 +47,13 @@ else
     then
         for PACKTYPE in DEBS RPMS
         do
-            echo "## Looking for distro type: ${PACKTYPE} ##" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+            echo "## Looking for distro type: ${PACKTYPE} ##" 
             # Copying
             cp ${PATH_SCRIPTS}/test_launch.sh ${PATH_DOCKERFILE}-${PACKTYPE}
 
             for DISTRO in ${!PACKTYPE} 
             do
-                echo "### Looking for ${DISTRO} ###" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+                echo "### Looking for ${DISTRO} ###" 
                 DISTRO_NAME="$(cut -d'-' -f1 <<<"${DISTRO}")"
                 DISTRO_VERS="$(cut -d'-' -f2 <<<"${DISTRO}")"
                 IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VERS}"

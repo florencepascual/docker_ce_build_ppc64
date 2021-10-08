@@ -15,13 +15,13 @@ pid=`/usr/bin/pgrep $DAEMON`
 
 if [ -z "$pid" ]
 then
-    echo "$DAEMON has not started after $(($TIMEOUT*2)) seconds" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "$DAEMON has not started after $(($TIMEOUT*2)) seconds" 
     exit 1
 else
-    echo "Found $DAEMON pid:$pid" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "Found $DAEMON pid:$pid" 
     ps -aef | grep docker | grep -v grep
     sleep 10
     ps -aef
-    echo "Launching docker info" 2>&1 | tee -a ${PATH_LOG_PROWJOB}
-    docker info 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "Launching docker info" 
+    docker info 
 fi

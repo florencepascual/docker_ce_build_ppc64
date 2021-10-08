@@ -17,13 +17,13 @@ tr -d '\n' < ${PATH_PASSWORD}_buffer > ${PATH_PASSWORD}
 chmod 600 ${PATH_PASSWORD}
 rm ${PATH_PASSWORD}_buffer
 apt update && apt install -y s3fs
-s3fs --version 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+s3fs --version 
 
 mkdir -p ${PATH_COS}/s3_${COS_BUCKET}
 # mount the cos bucket
 s3fs ${COS_BUCKET} ${PATH_COS}/s3_${COS_BUCKET} -o url=${URL_COS} -o passwd_file=${PATH_PASSWORD} -o ibm_iam_auth
 
-ls ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/ 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+ls ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/ 
 
 # copy the env.list to the local /workspace
 cp ${PATH_COS}/s3_${COS_BUCKET}/prow-docker/${FILE_ENV} /workspace/${FILE_ENV} 
@@ -43,7 +43,7 @@ fi
 # check we have the env.list, the dockertest and the containerd packages if CONTAINERD_VERS = 0
 if ! test -f /workspace/${FILE_ENV} && test -d ${PATH_DOCKERTEST}/dockertest
 then
-    echo "The env.list and/or the dockertest directory have not been copied." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "The env.list and/or the dockertest directory have not been copied." 
     exit 1
 fi
 
@@ -51,13 +51,13 @@ if [[ ${CONTAINERD_VERS} = "0" ]]
 then
     if test -d /workspace/containerd-*
     then
-        echo "The containerd packages have been copied." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "The containerd packages have been copied." 
         exit 0
     else
-        echo "The containerd packages have not been copied." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+        echo "The containerd packages have not been copied." 
         exit 1
     fi
 else
-    echo "The env.list and the dockertest directory have been copied." 2>&1 | tee -a ${PATH_LOG_PROWJOB}
+    echo "The env.list and the dockertest directory have been copied." 
     exit 0
 fi
