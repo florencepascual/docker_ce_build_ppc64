@@ -12,6 +12,9 @@ then
     echo "${SECRET_AUTH}" > /root/.docker/config.json
 fi
 
+docker --version
+containerd --version
+
 echo "= Docker test suite for ${DISTRO_NAME} ="
 export GOPATH=${WORKSPACE}/test:/go
 export GO111MODULE=auto
