@@ -12,23 +12,10 @@ set -o allexport
 source env.list
 source env-distrib.list
 
+sh ${PATH_SCRIPTS}/dockerd-entrypoint.sh &
+source ${PATH_SCRIPTS}/dockerd-waiting.sh
+
 echo "building static"
 pushd docker-ce-packaging/static
-# get the latest version of runc
-RUNC_VERS=$(eval "git ls-remote --refs --tags https://github.com/opencontainers/runc.git | cut --delimiter='/' --fields=3 | sort --version-sort | tail --lines=1")
-echo "VERSION=${DOCKER_VERS} CONTAINERD_VERSION=${CONTAINERD_VERS} RUNC_VERSION=${RUNC_VERS} make static-linux" > ${PATH_SCRIPTS}/build_static.sh
-chmod a+x ${PATH_SCRIPTS}/build_static.sh
-
-docker run -d -v /home/fpascual/testing-prow-job/test-static:/workspace --privileged --env DOCKER_VERS --env CONTAINERD_VERS --env RUNC_VERS --name docker-build-static2 quay.io/powercloud/docker-ce-build /bin/bash -c '${PATH_SCRIPTS}/build_static.sh'
-
-popd
-
-cp docker-ce-packaging/static/build/linux/*.tgz ${DIR_DOCKER}
-
-pushd ${DIR_DOCKER}
-FILES="*"
-for f in $FILES
-do
-  mv $f "${f//${DOCKER_VERS}/ppc64le}"
-done
+VERSION=${DOCKER_VERS} CONTAINERD_VERSION=v1.4.11 RUNC_VERSION=v1.0.2 make static-linux
 popd
